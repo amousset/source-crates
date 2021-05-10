@@ -1,0 +1,109 @@
+[pardiso-src]
+
+[blis-src]
+upstream_repository = "https://github.com/flame/blis"
+
+[openssl-src]
+upstream_license = "OpenSSL License/SSLeay"
+upstream_repository = "https://github.com/openssl/openssl"
+
+[intel-mkl-src]
+upstream_repository = "https://github.com/rust-math/intel-mkl-src"
+
+[freetype-src-sys]
+
+[libguile-src]
+
+[blas-src]
+comment = "several sources, chosen with feature flags"
+upstream_repository = "https://github.com/blas-lapack-rs/blas-src"
+
+[cblas-src]
+
+[mbedtls-src]
+
+[botan-src]
+upstream_repository = "https://github.com/randombit/botan.git"
+
+[hdf5-src]
+upstream_repository = "https://github.com/HDFGroup/hdf5.git"
+
+[libjxl-src]
+
+[lua-src]
+comment = "Several versions are included"
+upstream_license = "MIT"
+upstream_repository = "https://github.com/khvzak/lua-src-rs"
+
+[netlib-src]
+upstream_repository = "https://github.com/Reference-LAPACK/lapack.git"
+
+[cargo-wasi-src]
+
+[netcdf-src]
+upstream_repository = "https://github.com/magnusuMET/netcdf-c.git"
+
+[fftw3-src]
+
+[sqlite3-src]
+upstream_license = "Public Domain"
+upstream_repository = "https://github.com/copies/sqlite"
+
+[nettle-src]
+
+[libthemis-src]
+upstream_repository = "https://boringssl.googlesource.com/boringssl"
+
+[spdlog-src]
+upstream_repository = "https://github.com/gabime/spdlog.git"
+
+[accelerate-src]
+
+[openblas-src]
+upstream_repository = "https://github.com/xianyi/OpenBLAS.git"
+
+[sqlcipher-src]
+
+[zeromq-src]
+upstream_license = "GPLv3/LGPLv3"
+upstream_repository = "https://github.com/zeromq/libzmq"
+
+[suitesparse-src]
+upstream_repository = "https://github.com/DrTimothyAldenDavis/SuiteSparse.git"
+
+[cargo-src]
+
+[fftw-src]
+
+[boringssl-src]
+upstream_license = "OpenSSL License/SSLeay + ISC license"
+upstream_repository = "https://github.com/google/boringssl.git"
+
+[tikv-openssl-src]
+upstream_repository = "https://github.com/openssl/openssl"
+
+[dawn-src]
+
+[zlib-src-sys]
+
+[krb5-src]
+
+[yara-src]
+upstream_repository = "https://github.com/VirusTotal/yara.git"
+
+[lapack-src]
+upstream_repository = "https://github.com/blas-lapack-rs/lapack-src"
+
+[blosc-src]
+upstream_repository = "https://github.com/Blosc/c-blosc.git"
+
+[luajit-src]
+upstream_repository = "https://github.com/openresty/luajit2"
+
+[imxrt1062-src]
+
+[jq-src]
+upstream_repository = "https://github.com/stedolan/jq.git"
+
+[uvc-src]
+upstream_repository = "https://github.com/libuvc/libuvc.git"

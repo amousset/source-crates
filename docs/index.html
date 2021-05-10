@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Statically linked third-party code in Rust crates</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: sans;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      word-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Statically linked third-party code in Rust crates</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#current-state">Current state</a></li>
+<li><a href="#perspectives">Perspectives</a></li>
+</ul>
+</nav>
+<h2 id="introduction">Introduction</h2>
+<p>This article investigates the Rust crates including third-party code (often C/C++ libraries) statically linked into Rust binaries. The goal is to explore the current situation and the challenges, and to propose some improvements and proof-of-concepts for dedicated tooling.</p>
+<p>There are two main ways to include third-party dependency libraries into a crate source (and resulting binary):</p>
+<ul>
+<li>dedicated crates (usually containing <code>-src</code> in the name). A widely used example is <code>openssl-src</code> (used as <code>openssl-sys</code> dependency if the <code>vendored</code> feature is enabled).</li>
+<li>normal <a href="https://doc.rust-lang.org/cargo/reference/build-scripts.html#-sys-packages"><code>-sys</code> crates</a> which are able to compile the library they are providing an interface for, either by default or only when enabled by a feature flag (see this <a href="https://kornel.ski/rust-sys-crate">blog post</a> blog posts for explanations). A widely used example is <code>curl-sys</code>.</li>
+</ul>
+<p>Sometimes the code is copied into the repository, sometimes it is configured as a git submodule. In any case the source becomes part of the the crate uploaded to the registry.</p>
+<h2 id="current-state">Current state</h2>
+<p>In order to understand the current situation, besides currently recognizable <code>-src</code> crates, a first step can be to analyze the most downloaded crates, and look for included third-party code.</p>
+<h3 id="methodology">Methodology</h3>
+<ul>
+<li>Select all crates with more than 10k downloads (6984 crates on 2021-05-05)</li>
+<li>Try to clone all associated repositories (6322 crates successfully cloned with <a href="https://github.com/amousset/source-crates/blob/main/scripts/clone.sh"><code>scripts/clone.sh</code></a>)</li>
+<li>Look for submodules in the cloned crates (595 crates contained submodules)</li>
+<li>Then compute information about these crates and their submodules with <a href="https://github.com/amousset/source-crates/blob/main/scripts/modules.py"><code>scripts/modules.py</code></a> in <a href="https://github.com/amousset/source-crates/blob/main/data/crates.json"><code>data/crates.json</code></a>.</li>
+</ul>
+<p>Among those 595 crates containing submodules, there were 251 different submodule repositories (after excluding submodules in the same Github organization as the source repository). When several crates are hosted in the same directory, the submodule appears several time, which explain the high number of duplicates. The submodules list, with the repositories they are part of, computed with <a href="https://github.com/amousset/source-crates/blob/main/scripts/filter.py"><code>scripts/filter.py</code></a>, is located in <a href="https://github.com/amousset/source-crates/blob/main/data/submodules.json"><code>data/submodules.json</code></a>.</p>
+<p><em>Note: Three crates use code from the <a href="https://github.com/copies">copies</a> organization which provides mirrors for projects hosted outside of Github. It gives no indication about who it’s run by, and does not seem to be updated regularly, nor following upstream versions.</em></p>
+<p>Among these 251 included repositories:</p>
+<ul>
+<li>89 contained data sets (unicode data, time zones, syntax highlighting definitions, etc.)</li>
+<li>32 contained tests suites or test data set</li>
+<li>119 libraries, including 13 Rust libraries, 24 C++ libraries and 71 C libraries</li>
+</ul>
+<p>(these numbers are based on approximate tagging in <a href="https://github.com/amousset/source-crates/blob/main/data/repositories.toml"><code>data/repositories.toml</code></a>).</p>
+<p><strong>In short, there are 95 C/C++ native libraries in the top 7k crates (included with submodules, not counting those directly copied into the crate source.</strong></p>
+<p><strong>Only 7 crates including a C/C++ library among these 95 libraries have the <code>-src</code> suffix in their name</strong> (<code>boringssl-src</code>, <code>openblas-src</code>, <code>sqlite3-src</code>, <code>openssl-src</code>, <code>netlib-src</code>, <code>zeromq-src</code> and <code>luajit-src</code>).</p>
+<h3 id="conclusions">Conclusions</h3>
+<ul>
+<li>A lot of widely-used crates include third-party libraries</li>
+<li>There is no consistency in naming (crates, features) or behaviors. Some <code>-sys</code> crates (like <a href="https://github.com/alexcrichton/curl-rust/issues/321"><code>curl-sys</code></a>) use statically linked dependencies automatically if not detected on the build system</li>
+</ul>
+<p>This can be a source of problems, especially because of the lack of visibility over the included code in terms of:</p>
+<ul>
+<li><em>Presence</em>: It is not always easy to even know if a library was statically linked as it does not appear in the crates tree</li>
+<li><em>Licenses</em>: They are often different from the Rust source, and not easily discoverable. For example, <code>cargo deny check licenses</code> cannot check them.</li>
+<li><em>Vulnerabilities</em>: Except for dedicated source crates (<code>openssl-src</code> has <a href="https://rustsec.org/packages/openssl-src.html">RustSec advisories</a>), there is no visibility over vulnerabilities affecting the library in the usual Rust tooling (<code>cargo-audit</code> and <code>cargo-deny</code>)</li>
+<li><em>Versioning</em>: There is no easy visibility over the upstream version. Sometime the upstream version is used as build version for dedicated crates, like <code>111.15.0+1.1.1k</code> for <code>openssl-src</code> (<code>1.1.1k</code> being the upstream release pointed by the submodule commit)</li>
+<li><em>Trust</em>: The code is included from external git repositories, written by unidentified people, and is not visible in tooling like <code>cargo-supply-chain</code>, <code>rust-audit</code> or <code>cargo-crev</code></li>
+</ul>
+<h2 id="perspectives">Perspectives</h2>
+<h3 id="best-practices-for-libraries">Best practices for libraries</h3>
+<p>To help the ecosystem converge towards common practices (like it is done for <code>-sys</code> crates), it could be useful to discuss and document them.</p>
+<p>They could include (based on existing crates):</p>
+<ul>
+<li>Recommend to split third-party code inclusion into separate crates, and name them with the <code>-src</code> suffix</li>
+<li>Use the upstream version as crate build version</li>
+<li>Use git submodules when possible as it makes upstream tracking easier</li>
+<li>Use a common behavior for static linking, including feature naming</li>
+</ul>
+<p>This would allow:</p>
+<ul>
+<li>To improve discoverability and help library authors who want to allow statically linking a dependency</li>
+<li>To know when a static library is included, directly from <code>cargo-tree</code></li>
+<li>To file RustSec advisories for vulnerabilities in upstream libraries (like already done for <code>openssl-src</code>). We could automate detection based on CVEs for common libraries, and integrate directly with <code>cargo-audit</code> and <code>cargo-deny</code></li>
+</ul>
+<h3 id="dedicated-tooling">Dedicated tooling</h3>
+<p>Even if all source crates were dedicated and recognizable, important information would still be missing. Before an integrated solution, a solution could be to semi-manually define a database of information about upstream libraries, which could be consumed by the tooling.</p>
+<p>This database could include:</p>
+<ul>
+<li>the library license</li>
+<li>the upstream repository (to avoid having to clone to look for submodules)</li>
+</ul>
+<p>This would allow:</p>
+<ul>
+<li>To correctly check for licenses in statically linked libraries</li>
+<li>To get information about upstream authors in <code>cargo-supply-chain</code></li>
+</ul>
+<p>A proof-of-concept of such a database is present in <a href="https://github.com/amousset/source-crates/blob/main/db/source-crates.toml">db/source-crates.toml</a>, which contains existing <code>-src</code> crates. The <a href="https://github.com/amousset/source-crates/tree/main/src-crates"><code>src-crates</code></a> cli allows updating its content from crates.io.</p>
+<h3 id="proof-of-concept">Proof of concept</h3>
+<p>The easiest option for source crates integration would be to be able to use usual tooling of the Rust ecosystem.</p>
+<h4 id="cargo-supply-chain"><code>cargo supply-chain</code></h4>
+<p>It could be modified to use the information database and display the list of source crates with:</p>
+<ul>
+<li>License</li>
+<li>Version (based on crate version)</li>
+<li>Publisher (Github organization in practice for now)</li>
+</ul>
+<p>Current <a href="https://github.com/amousset/cargo-supply-chain/tree/source_crates">experimental branch</a> gives something like:</p>
+<pre><code>$ cargo supply-chain source-crates
+Source crates packaging third-party projects:
+krb5
+  version: 1.18.2
+openssl
+  license: OpenSSL License/SSLeay
+  repository: https://github.com/openssl/openssl
+  version: 1.1.1k</code></pre>
+<p>It parses upstream version from source crate version and uses information from the source crated database in this repository.</p>
+<h4 id="cargo-deny-licenses"><code>cargo deny licenses</code></h4>
+<p>The same principle could be done to add static libraries licenses to <code>cargo deny</code> and properly check all included code.</p>
+</body>
+</html>

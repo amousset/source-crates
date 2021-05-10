@@ -1,0 +1,14 @@
+[package]
+name = "src-crates"
+version = "0.1.0"
+authors = ["Alexis Mousset <contact@amousset.me>"]
+edition = "2018"
+license = "Apache-2.0 OR MIT"
+
+
+[dependencies]
+crates-index = "0.16"
+crates_io_api = "0.7"
+toml = "0.5"
+serde = { version = "1", features = ["derive"] }
+regex = "1"
