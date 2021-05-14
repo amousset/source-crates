@@ -180,14 +180,16 @@
 <p>Several options:</p>
 <ul>
 <li>Try to encourage adoption of <code>-src</code> crates, with a proper versioning convention.
-This could start in cargo documentation.</li>
+This could start in cargo documentation. This allows treating the source crate as if it was
+the upstream package for security advisories, and other tooling.</li>
 <li>Try to crate a database of crates including source code with
 the features controlling its inclusion to be able to use the
 information, to be able to manage non dedicated source crates.</li>
 </ul>
 <p>This would allow:</p>
 <ul>
-<li>(cargo-audit)[https://github.com/Shnatsel/rust-audit#what-about-keeping-track-of-versions-of-statically-linked-c-libraries]</li>
+<li>To track statically built dependencies in (rust-audit)[https://github.com/Shnatsel/rust-audit#what-about-keeping-track-of-versions-of-statically-linked-c-libraries]</li>
+<li>To track vulnerabilities in (cargo-audit)[https://github.com/RustSec/rustsec]/(cargo-deny)[https://github.com/EmbarkStudios/cargo-deny]</li>
 </ul>
 <h2 id="current-issues"><a class="header" href="#current-issues">Current issues</a></h2>
 <p>Source code embedded is invisible to most tooling:</p>
