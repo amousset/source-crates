@@ -169,7 +169,7 @@
 <p>This article investigates a specific type of crates,
 those including third-party code (often C/C++ libraries)
 statically linked into Rust binaries.</p>
-<p>The goal is to explore the current situation and the challenges, and then to
+<p>The goal is to explore the current situation and the challenges, and to
 propose some improvements and proof-of-concepts for dedicated tooling.</p>
 <h2 id="source-crates"><a class="header" href="#source-crates">Source crates</a></h2>
 <p>A &quot;source crate&quot; is
@@ -178,18 +178,17 @@ resulting library (or binary).</p>
 <p>There are several types of them. Some are dedicated crates (usually
 containing <code>-src</code> in the name), some are <a href="https://doc.rust-lang.org/cargo/reference/build-scripts.html#-sys-packages"><code>-sys</code> crates</a>
 which are able to compile the library they are providing an interface for,
-either by default or when enabled by a feature flag.</p>
+either by default or only when enabled by a feature flag.</p>
 <p>A good explanation of how to include a static dependency build in a <code>-sys</code>
 crate is available in <a href="https://kornel.ski/rust-sys-crate">this article</a>.</p>
-<p>Widely used examples are <code>openssl-src</code> or <code>curl-sys</code>.</p>
 <p>Sometimes the code is copied into the repository, sometimes it
 is configured as a git submodule. In any case the source becomes part of the
 the crate uploaded to the registry.</p>
+<p>Widely used examples of both types are <code>openssl-src</code> or <code>curl-sys</code>.</p>
 <h2 id="goals"><a class="header" href="#goals">Goals</a></h2>
-<p>Several goals:</p>
 <ul>
-<li>Explore third-party-code in crates (through the lens of submodules in most popular crates)</li>
-<li>Give leads to improve management of <code>-src</code> crates in the ecosystem</li>
+<li>Explore third-party-code in most popular crates</li>
+<li>Ideas to improve management of source crates in the ecosystem</li>
 <li>Proof-of-concept of source crates database and integration to the ecosystem</li>
 </ul>
 

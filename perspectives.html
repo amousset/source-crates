@@ -166,6 +166,7 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="perspectives"><a class="header" href="#perspectives">Perspectives</a></h1>
+<h2 id="current-issues"><a class="header" href="#current-issues">Current issues</a></h2>
 <ul>
 <li>
 <p>trust (a la <code>cargo-supply-chain</code>) (not the goal here)</p>
@@ -177,21 +178,6 @@
 <p>upgrades with static libraries</p>
 </li>
 </ul>
-<p>Several options:</p>
-<ul>
-<li>Try to encourage adoption of <code>-src</code> crates, with a proper versioning convention.
-This could start in cargo documentation. This allows treating the source crate as if it was
-the upstream package for security advisories, and other tooling.</li>
-<li>Try to crate a database of crates including source code with
-the features controlling its inclusion to be able to use the
-information, to be able to manage non dedicated source crates.</li>
-</ul>
-<p>This would allow:</p>
-<ul>
-<li>To track statically built dependencies in (rust-audit)[https://github.com/Shnatsel/rust-audit#what-about-keeping-track-of-versions-of-statically-linked-c-libraries]</li>
-<li>To track vulnerabilities in (cargo-audit)[https://github.com/RustSec/rustsec]/(cargo-deny)[https://github.com/EmbarkStudios/cargo-deny]</li>
-</ul>
-<h2 id="current-issues"><a class="header" href="#current-issues">Current issues</a></h2>
 <p>Source code embedded is invisible to most tooling:</p>
 <ul>
 <li>
@@ -219,12 +205,36 @@ for a vulnerability in the third-party code.</p>
 </li>
 </ul>
 <h2 id="propositions"><a class="header" href="#propositions">Propositions</a></h2>
+<p>Several options:</p>
 <ul>
-<li>Document the <code>-src</code> crates as best practice in cargo documentation</li>
-<li>Move most used included code from <code>-sys</code> crates to dedicated <code>-src</code> crates</li>
-<li>File advisories for vulnerabilities in sources (already done for <code>openssl-src</code>). We could
-automate detection based on CVEs for common libraries.</li>
-<li>Document licenses and upstream repositories/provider somehow</li>
+<li>Try to encourage adoption of <code>-src</code> crates, with a proper versioning convention.
+This could start in cargo documentation. This allows treating the source crate as if it was
+the upstream package for security advisories, and other tooling.</li>
+<li>Try to crate a database of crates including source code with
+the features controlling its inclusion to be able to use the
+information, to be able to manage non dedicated source crates.</li>
+</ul>
+<p>This would allow:</p>
+<ul>
+<li>
+<p>To track statically built dependencies in (rust-audit)[https://github.com/Shnatsel/rust-audit#what-about-keeping-track-of-versions-of-statically-linked-c-libraries]</p>
+</li>
+<li>
+<p>To track vulnerabilities in (cargo-audit)[https://github.com/RustSec/rustsec]/(cargo-deny)[https://github.com/EmbarkStudios/cargo-deny]</p>
+</li>
+<li>
+<p>Document the <code>-src</code> crates as best practice in cargo documentation</p>
+</li>
+<li>
+<p>Move most used included code from <code>-sys</code> crates to dedicated <code>-src</code> crates</p>
+</li>
+<li>
+<p>File advisories for vulnerabilities in sources (already done for <code>openssl-src</code>). We could
+automate detection based on CVEs for common libraries.</p>
+</li>
+<li>
+<p>Document licenses and upstream repositories/provider somehow</p>
+</li>
 </ul>
 <h2 id="proof-of-concept"><a class="header" href="#proof-of-concept">Proof of concept</a></h2>
 <h3 id="cargo-supply-chain"><a class="header" href="#cargo-supply-chain"><code>cargo supply-chain</code></a></h3>

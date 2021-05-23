@@ -167,50 +167,57 @@
                     <main>
                         <h1 id="exploration"><a class="header" href="#exploration">Exploration</a></h1>
 <h2 id="goals"><a class="header" href="#goals">Goals</a></h2>
-<p>In order to understand the current situation, besides ... <code>-src</code> crates,
-a good option it to analyze the most downloaded crates for third-party code.</p>
+<p>In order to understand the current situation, besides recognizable <code>-src</code> crates,
+a first step it to analyze the most downloaded crates for third-party code:</p>
 <ul>
 <li>Get a list of the 10% most downloaded crates</li>
 <li>Try to clone their documented repository</li>
-<li>Look for submodules</li>
+<li>Look for submodules. This misses all the code that is simply copied and not configured as
+submodule but it should give a representative enough overview.</li>
 </ul>
-<p>This misses:</p>
-<ul>
-<li>90% of the crates</li>
-<li>All code that is simply copied and not configured as submodule</li>
-</ul>
-<p>But it should give a representative enough overview.</p>
 <h3 id="methodology"><a class="header" href="#methodology">Methodology</a></h3>
 <ul>
 <li>Selected all crates with more than 10k downloads on the 2021-05-05 (6984 crates)</li>
-<li>Tried to clone all repositories associated (6322 crates successfully clone)</li>
-<li>Look for submodules in the cloned crates, 592 crates contained submodules</li>
+<li>Tried to clone all repositories associated (6322 crates successfully cloned with <code>scripts/clone.sh</code>)</li>
+<li>Look for submodules in the cloned crates, 595 crates contained submodules. The results computed with
+<code>scripts/modules.py</code> is on <code>data/crates.json.</code></li>
 </ul>
 <p>Among those 595 crates containing submodules, there were 251 different
 submodule repositories (after excluding submodules in the same github organization
 as the source repository).</p>
-<p>NOTE : when several crates are hosted in the same directory, the submodule appears
+<p>The submodules with the repositories they are part of, computed with <code>filter.py</code>, is in <code>data/submodules.json</code>.</p>
+<p>NOTE: when several crates are hosted in the same directory, the submodule appears
 several time, which explain the high number of duplicates.</p>
-<p>These 251 repositories were:</p>
+<p>Among these 251 repositories:</p>
 <ul>
-<li>89 contained data (unicode data, time-zones, syntax highlighting definitions, etc.)</li>
+<li>89 contained data sets (unicode data, time zones, syntax highlighting definitions, etc.)</li>
 <li>32 contained tests suites or test data set</li>
 <li>119 libraries, including 13 Rust libraries, 24 C++ libraries and 71 C libraries</li>
 </ul>
-<p>(these numbers are based on approximate tagging in <code>repositories.toml</code> but give an estimate).</p>
+<p>(these numbers are based on approximate tagging in <code>data/repositories.toml</code> but give an estimate).</p>
 <p><strong>In short, there are 95 C/C++ native libraries included in the top 7k crates using submodules,
 not counting those directly copied into the crate source.</strong></p>
-<h3 id="found-issues"><a class="header" href="#found-issues">Found issues</a></h3>
+<p>A total of 7 crates including a C/C++ library among these have the <code>-src</code> in their name:</p>
+<ul>
+<li><code>boringssl-src</code></li>
+<li><code>penblas-src</code></li>
+<li><code>sqlite3-src</code></li>
+<li><code>openssl-src</code></li>
+<li><code>netlib-src</code></li>
+<li><code>zeromq-src</code></li>
+<li><code>luajit-src</code></li>
+</ul>
+<h3 id="notes"><a class="header" href="#notes">Notes</a></h3>
 <ul>
 <li>Three crates use code from the https://github.com/copies organization which
 provides mirrors for projects hosted outside of Github. It gives no indication
-about who it's run by, and seem to be updated regularly, nor following upstream
+about who it's run by, and does not seem to be updated regularly, nor following upstream
 versions.</li>
-<li>Some crates use <code>http://</code> URLs in submodules.</li>
 </ul>
 <h2 id="general-problems"><a class="header" href="#general-problems">General problems</a></h2>
 <p>These third-party dependencies are often invisible, sometimes embedded by default.
-They often don't have proper security advisories, and random upstream update.</p>
+They often don't have proper security advisories, and random upstream update.
+Sometimes upstream is not trustworthy either.</p>
 
                     </main>
 
