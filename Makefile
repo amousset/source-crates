@@ -1,4 +1,6 @@
-all: clean fmt docs/index.html
+all: clean html
+
+html: docs/index.html
 
 fmt:
 	mdformat --wrap 100 README.md

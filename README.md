@@ -1,111 +1,15 @@
-https://amousset.github.io/source-crates/ https://rust-lang.github.io/rfcs/2856-project-groups.html
+# External source crates
 
-- Feature Name: `external_source_crates`
-- Start Date: 2021-08-08
+The goals would be something along the lines of creating guidelines for handling
+externally imported code and developing the supporting tooling (automatic import of new releases,
+automatic import of CVEs to RustSec, etc) Or, in terms of problems rather than solutions - make it
+easier to import C/C++ code in a secure and reliable manner and keep it up-to-date
 
-# Summary
-
-One paragraph explanation of the feature.
-
-# Motivation
-
-Why are we doing this? What use cases does it support? What is the expected outcome?
-
-# Guide-level explanation
-
-Explain the proposal as if it was already included in the language and you were teaching it to
-another Rust programmer. That generally means:
-
-- Introducing new named concepts.
-- Explaining the feature largely in terms of examples.
-- Explaining how Rust programmers should *think* about the feature, and how it should impact the way
-  they use Rust. It should explain the impact as concretely as possible.
-- If applicable, provide sample error messages, deprecation warnings, or migration guidance.
-- If applicable, describe the differences between teaching this to existing Rust programmers and new
-  Rust programmers.
-
-For implementation-oriented RFCs (e.g. for compiler internals), this section should focus on how
-compiler contributors should think about the change, and give examples of its concrete impact. For
-policy RFCs, this section should provide an example-driven introduction to the policy, and explain
-its impact in concrete terms.
-
-# Reference-level explanation
-
-This is the technical portion of the RFC. Explain the design in sufficient detail that:
-
-- Its interaction with other features is clear.
-- It is reasonably clear how the feature would be implemented.
-- Corner cases are dissected by example.
-
-The section should return to the examples given in the previous section, and explain more fully how
-the detailed proposal makes those examples work.
-
-# Drawbacks
-
-Why should we *not* do this?
-
-# Rationale and alternatives
-
-- Why is this design the best in the space of possible designs?
-- What other designs have been considered and what is the rationale for not choosing them?
-- What is the impact of not doing this?
-
-# Prior art
-
-Discuss prior art, both the good and the bad, in relation to this proposal. A few examples of what
-this can include are:
-
-- For language, library, cargo, tools, and compiler proposals: Does this feature exist in other
-  programming languages and what experience have their community had?
-- For community proposals: Is this done by some other community and what were their experiences with
-  it?
-- For other teams: What lessons can we learn from what other communities have done here?
-- Papers: Are there any published papers or great posts that discuss this? If you have some relevant
-  papers to refer to, this can serve as a more detailed theoretical background.
-
-This section is intended to encourage you as an author to think about the lessons from other
-languages, provide readers of your RFC with a fuller picture. If there is no prior art, that is fine
-\- your ideas are interesting to us whether they are brand new or if it is an adaptation from other
-languages.
-
-Note that while precedent set by other languages is some motivation, it does not on its own motivate
-an RFC. Please also take into consideration that rust sometimes intentionally diverges from common
-language features.
-
-# Unresolved questions
-
-- What parts of the design do you expect to resolve through the RFC process before this gets merged?
-- What parts of the design do you expect to resolve through the implementation of this feature
-  before stabilization?
-- What related issues do you consider out of scope for this RFC that could be addressed in the
-  future independently of the solution that comes out of this RFC?
-
-# Future possibilities
-
-Think about what the natural extension and evolution of your proposal would be and how it would
-affect the language and project as a whole in a holistic way. Try to use this section as a tool to
-more fully consider all possible interactions with the project and language in your proposal. Also
-consider how this all fits into the roadmap for the project and of the relevant sub-team.
-
-This is also a good place to "dump ideas", if they are out of scope for the RFC you are writing but
-otherwise related.
-
-If you have tried and cannot think of any future possibilities, you may simply state that you cannot
-think of anything.
-
-Note that having something written down in the future-possibilities section is not a reason to
-accept the current or a future RFC; such notes should be in the section on motivation or rationale
-in this or subsequent RFCs. The section merely provides additional information.
-
-Case study openssl-src le mieux pour l'instant
-
-etude quantitative et qualitative
-
-## Introduction
+It is a good idea to use crates.io as a repository for C/C++ dependencies used by Rust library? It's already massively used, and we need to deal with it.
 
 This article investigates the Rust crates including third-party code (often C/C++ libraries)
 statically linked into Rust binaries. The goal is to explore the current situation and the
-challenges, and to propose some improvements and proof-of-concepts for dedicated tooling.
+challenges it creates, and to propose some possible improvements.
 
 There are two main ways to include third-party dependency libraries into a crate source (and
 resulting binary):
@@ -122,8 +26,7 @@ any case the source becomes part of the the crate uploaded to the registry.
 
 ## Current state
 
-In order to understand the current situation, besides currently recognizable `-src` crates, a first
-step can be to analyze the most downloaded crates, and look for included third-party code.
+To get an idea to which extend this pattern is used, let's explore crates.io content.
 
 ### Methodology
 
@@ -156,138 +59,149 @@ Among these 251 included repositories:
 (these numbers are based on approximate tagging in
 [`data/repositories.toml`](https://github.com/amousset/source-crates/blob/main/data/repositories.toml)).
 
-**In short, there are 95 C/C++ native libraries in the top 7k crates (included with submodules, not
-counting those directly copied into the crate source.**
+### Results
 
-**Only 7 crates including a C/C++ library among these 95 libraries have the `-src` suffix in their
-name** (`boringssl-src`, `openblas-src`, `sqlite3-src`, `openssl-src`, `netlib-src`, `zeromq-src`
+In short, there are 95 C/C++ native libraries in the top 7k crates (included with submodules, not
+counting those directly copied into the crate source.
+
+Only 7 crates including a C/C++ library among these 95 libraries currently have the `-src` suffix in their
+name (`boringssl-src`, `openblas-src`, `sqlite3-src`, `openssl-src`, `netlib-src`, `zeromq-src`
 and `luajit-src`).
 
-### Conclusions
+## Issues
+
+We have seen that:
 
 - A lot of widely-used crates include third-party libraries
-- There is no consistency in naming (crates, features) or behaviors. Some `-sys` crates (like
-  [`curl-sys`](https://github.com/alexcrichton/curl-rust/issues/321)) use statically linked
-  dependencies automatically if not detected on the build system
+- There is no consistency in naming (crates, features) or behaviors. Some `-sys` crates (like [`curl-sys`](https://github.com/alexcrichton/curl-rust/issues/321)) even silently fall back to using statically linked dependencies if not detected on the build system.
 
-This can be a source of problems, especially because of the lack of visibility over the included
-code in terms of:
+This can be a source of problems, especially because of the lack of visibility over the included code in terms of:
 
-- *Presence*: It is not always easy to even know if a library was statically linked as it does not
-  appear in the crates tree
-- *Licenses*: They are often different from the Rust source, and not easily discoverable. For
-  example, `cargo deny check licenses` cannot check them.
-- *Vulnerabilities*: Except for dedicated source crates (`openssl-src` has
-  [RustSec advisories](https://rustsec.org/packages/openssl-src.html)), there is no visibility over
-  vulnerabilities affecting the library in the usual Rust tooling (`cargo-audit` and `cargo-deny`)
-- *Versioning*: There is no easy visibility over the upstream version. Sometime the upstream version
-  is used as build version for dedicated crates, like `111.15.0+1.1.1k` for `openssl-src` (`1.1.1k`
-  being the upstream release pointed by the submodule commit)
-- *Trust*: The code is included from external git repositories, written by unidentified people, and
-  is not visible in tooling like `cargo-supply-chain`, `rust-audit` or `cargo-crev`
+- *Presence*: It is not always easy to even know if a library was statically linked as it does not appear in the crates tree, nor `cargo-audit` output.
+- *Licenses*: They are often different from the Rust source, and not easily discoverable. For example, `cargo deny check licenses` cannot check them. A good example is the OpenSSL licence for versions before 3.0, which is incompatible with GPL.
+- *Vulnerabilities*: Except for dedicated source crates (`openssl-src` has [RustSec advisories](https://rustsec.org/packages/openssl-src.html)), there is no visibility over vulnerabilities affecting the included library in the usual Rust tooling (`cargo-audit` and `cargo-deny`)
+- *Versioning*: There is no easy visibility over the upstream version. Sometime the upstream version is used as build version for dedicated crates, like `111.15.0+1.1.1k` for `openssl-src` (`1.1.1k` being the upstream release pointed by the submodule commit)
+- *Trust*: The code is included from external git repositories, written by unidentified people, and is not visible in tooling like `cargo-supply-chain`, `rust-audit` or `cargo-crev`
 
-## Perspectives
+Current challenges with software supply chain attacks push TODO.
 
-### Best practices for libraries
 
-To help the ecosystem converge towards common practices (like it is done for `-sys` crates), it
-could be useful to discuss and document them.
+### Security
 
-They could include (based on existing crates):
+### Compliance
 
-- Recommend to split third-party code inclusion into separate crates, and name them with the `-src`
-  suffix
-- Use the upstream version as crate build version
+SBOM
+
+## Prior art
+
+Not much. `sys` crates for naming-based behavior and conventions.
+
+### Other ecosystems
+
+#### D-lang
+
+https://code.dlang.org/packages/openssl
+
+* Uses a versioning scheme similar to the rust crate (`2.0.3+1.1.0h`). 
+* Documents the openssl license as the package license ("OpenSSL or SSLeay")
+
+### crates.io
+
+#### curl-sys
+
+Other crates work like this (`brotli-sys`).
+
+#### openssl-src
+
+One of the most used crate embedding a static library is `openssl-src`. It is an example of a dedicated crate, i.e. it only contains the logic to build openssl and its sources (through a git submodule).
+
+The crate versions are built as the following SemVer string: `111.16.0+1.1.1l`, defined as `MAJOR.MINOR.PATCH+BUILD`
+
+The build metadata here is used as upstream version documentation. The major version documents the compatibility of the library (1.1.OX, 1.1.1X, etc. are compatible). The minor version is incremented at each upstream patch version bump. The patch version is used for changes in the crate not linked to an upstream version bump.
+
+Build metadata is [defined](https://semver.org/#spec-item-10) as:
+
+> Build metadata MAY be denoted by appending a plus sign and a series of dot separated identifiers immediately following the patch or pre-release version. Identifiers MUST comprise only ASCII alphanumerics and hyphens [0-9A-Za-z-]. Identifiers MUST NOT be empty. Build metadata MUST be ignored when determining version precedence. Thus two versions that differ only in the build metadata, have the same precedence. Examples: 1.0.0-alpha+001, 1.0.0+20130313144700, 1.0.0-beta+exp.sha.5114f85, 1.0.0+21AF26D3—-117B344092BD.
+
+This means that the upstream version is:
+
+* Ignored by version comparison
+* Can contain various embedded version representation
+
+The `openssl-src` crate is used by `openssl-sys` (and openssl is statically built in the resulting binary) when the `vendored` feature is enabled (which it is not by default). Crates depending on `openssl-sys` or (like `native-tls`) may expose a similar flag too.
+
+## Propositions
+
+### Define an official convention
+
+Just as `-sys` crates have an official definition in cargo docs, with a set of best practices, a first step could be to come up with similar guidelines for external source crates. This should build upon and stay compatible with existing implementation, and allow an easy convergence for libraries using different patterns.
+
+This could be improved by additionnal cargo metadata.
+
+#### Draft proposal
+
+- Split third-party code inclusion into dedicated separate crates, and name them with the `-src` suffix
+- Use the upstream version as crate build version. This means that the crate version needs to be incremented for each upstream update (as already done for `openssl-src`). The problem is that it makes version requirements in dependant crates less readable (as the upstream version is not part of it). It could a plus though, as a lot of projects don't use semver versionning.
 - Use git submodules when possible as it makes upstream tracking easier
-- Use a common behavior for static linking, including feature naming
+- Add a reference to the included code in the cargo metadata TODO
+- Use a common behavior for static linking in libraries, including feature naming
 
 This would allow:
 
-- To improve discoverability and help library authors who want to allow statically linking a
-  dependency
+- To improve discoverability and help library authors who want to allow statically linking a dependency
 - To know when a static library is included, directly from `cargo-tree`
-- To file RustSec advisories for vulnerabilities in upstream libraries (like already done for
-  `openssl-src`). We could automate detection based on CVEs for common libraries, and integrate
-  directly with `cargo-audit` and `cargo-deny`
+- To file RustSec advisories for vulnerabilities in upstream libraries (like already done for `openssl-src`). We could automate detection based on CVEs for common libraries, and integrate directly with `cargo-audit` and `cargo-deny`
 
-### Dedicated tooling
+#### Limitations
 
-Even if all source crates were dedicated and recognizable, important information would still be
-missing. Before an integrated solution, a solution could be to semi-manually define a database of
-information about upstream libraries, which could be consumed by the tooling.
+* If the `-src` contains dedicated code to build the included code, it is a problem is licensed under a license different from the included code
+* There is no standard way to designate a piece of software, espacially C/C++ libraries. It could be a link to a Git repository. TODO
+* putting the upstream version in build metadata (i.e. after +) is not a great idea because
+according to the semver spec there is no defined ordering for versions that only differ by build
+metadata. Meaning it might not be possible to match on some build versions but not others, which
+would be necessary for RustSec. But that's details.
 
-This database could include:
 
-- the library license
-- the upstream repository (to avoid having to clone to look for submodules)
+### Improve tooling
 
-This would allow:
+Cargo-based tooling could get some knowledge to detect `-src` crates and implement special handling (extract upstream version, etc.).
 
-- To correctly check for licenses in statically linked libraries
-- To get information about upstream authors in `cargo-supply-chain`
+This could allow implementing correct [SBOM](https://www.cisa.gov/sbom) (like [cargo-spdx](https://github.com/alilleybrinker/cargo-spdx)).
 
-A proof-of-concept of such a database is present in
-[db/source-crates.toml](https://github.com/amousset/source-crates/blob/main/db/source-crates.toml),
-which contains existing `-src` crates. The
-[`src-crates`](https://github.com/amousset/source-crates/tree/main/src-crates) cli allows updating
-its content from crates.io.
 
-### Proof of concept
 
-The easiest option for source crates integration would be to be able to use usual tooling of the
-Rust ecosystem.
 
-#### `cargo supply-chain`
-
-It could be modified to use the information database and display the list of source crates with:
-
-- License
-- Version (based on crate version)
-- Publisher (Github organization in practice for now)
-
-Current [experimental branch](https://github.com/amousset/cargo-supply-chain/tree/source_crates)
-gives something like:
-
-```
-$ cargo supply-chain source-crates
-Source crates packaging third-party projects:
-krb5
-  version: 1.18.2
-openssl
-  license: OpenSSL License/SSLeay
-  repository: https://github.com/openssl/openssl
-  version: 1.1.1k
-```
-
-It parses upstream version from source crate version and uses information from the source crated
-database in this repository.
-
-#### `cargo deny licenses`
-
-The same principle could be done to add static libraries licenses to `cargo deny` and properly check
-all included code.
 
 
 # NOTES
 
-TODO parallele avec vendoring
+advisory unmaintained pour https://github.com/nodejs/http-parser
+https://github.com/rustsec/advisory-db/pull/1124
+https://internals.rust-lang.org/t/pre-rfc-cargo-features-for-configuring-sys-crates/12431
+https://amousset.github.io/source-crates/ 
+https://rust-lang.github.io/rfcs/2856-project-groups.html
+https://internals.rust-lang.org/t/how-to-audit-and-improve-rust-crates-eco-system-for-security-in-general/16699 
+
+https://www.reddit.com/r/rust/comments/n43pcb/psa_libzsys_on_musl_no_longer_links_statically_by/
+
+- crates versions and features: use `rust-audit`
+
+- compiler version:
+
+  - Easily accessible with [rustc_version_runtime](https://crates.io/crates/rustc_version_runtime)
+  - Always there (in non-stripped binaries):
+
+```
+$ strings your_executable | grep 'rustc version'
+clang LLVM (rustc version 1.51.0 (2fd73fabe 2021-03-23))
+```
 
 
-
-I agree with pretty much everything! That sounds like something I would have done, and I mean that
-in the best possible way. I believe the problem is real and what you propose is a reasonable
-solution. I'm not entirely sold on having the license and upstream repo metadata in a third-party
-repository. I'd rather have it right in the -src crate. I wonder if we can (ab)use the existing
-Cargo.toml format for that? After all, it is needed for an upload to crates.io regardless, and e.g.
-openssl-src ships it.
 
 I'm also not convinced that submodules are a good idea. There are a lot of pitfalls around them; for
 one, a repo with submodules is no longer defined by its commit hash, which makes reproducibility a
 lot harder. Also, it turns out that C/C++ projects often have different contents in git compared to
 release tarballs, and require different procedures to build from git vs release tarballs.
-
-I strongly support the -src crate convention, for all the reasons you've listed. Automatic detection
-of CVEs sounds great, and relatively easy to implement.
 
 another thing I've lamented is how much e.g. curl versions lag behind upstream, even in case of
 critical security fixes. We could build automated infrastructure for updating library versions: new
@@ -301,16 +215,3 @@ to specify "I want -src version X" even though you don't depend on it directly? 
 and src crates be published together and always have the same version to allow selecting a specific
 version of -src crate?
 
-I believe the best way to make progress on this is get a project group going. You can find out more
-about those here The goals would be something along the lines of creating guidelines for handling
-externally imported code and developing the supporting tooling (automatic import of new releases,
-automatic import of CVEs to RustSec, etc) Or, in terms of problems rather than solutions - make it
-easier to import C/C++ code in a secure and reliable manner and keep it up-to-date
-
-I would be happy to act as the liason for RustSec and cargo-supply-chain, but my availability during
-the rest of the summer may be spotty.
-
-Oh, putting the upstream version in build metadata (i.e. after +) is not a great idea because
-according to the semver spec there is no defined ordering for versions that only differ by build
-metadata. Meaning it might not be possible to match on some build versions but not others, which
-would be necessary for RustSec. But that's details.
