@@ -7,7 +7,8 @@ import re
 from pprint import pprint
 import email.utils
 
-directory = "crates-src"
+directory = "crates"
+repo_dir = "repos"
 
 modules = {}
 # list of crates we couldn't check
@@ -29,7 +30,10 @@ def clean_url(url):
 for crate in os.listdir(directory):
     print(f"= {crate}")
 
-    if os.path.isfile(os.path.join(directory, crate)):
+    f = open(os.path.join(directory, crate), "r")
+    repo = f.read().strip()
+
+    if repo == "norepo" or repo == "auth":
         modules["nocheck_crates"].append(crate)
         continue
 
@@ -38,7 +42,7 @@ for crate in os.listdir(directory):
 
     # Repo url
     proc = subprocess.Popen(["git config -f .git/config -l"],
-                            cwd=os.path.join(directory, crate),
+                            cwd=os.path.join(repo_dir, repo),
                             stdout=subprocess.PIPE, shell=True)
     (out, err) = proc.communicate()
     for line in out.decode('utf-8').splitlines():
@@ -48,7 +52,7 @@ for crate in os.listdir(directory):
 
     # Commit id
     proc = subprocess.Popen(["git log -q"],
-                            cwd=os.path.join(directory, crate),
+                            cwd=os.path.join(repo_dir, repo),
                             stdout=subprocess.PIPE, shell=True)
     (out, err) = proc.communicate()
     for line in out.decode('utf-8').splitlines():
@@ -57,12 +61,12 @@ for crate in os.listdir(directory):
             modules["crates"][crate]["commit"] = search.group(1)
 
     # Submodules
-    modules_file = os.path.join(directory, crate, ".gitmodules")
+    modules_file = os.path.join(repo_dir, repo, ".gitmodules")
     if os.path.exists(modules_file) and not os.stat(modules_file).st_size == 0:
         modules["crates"][crate]["submodules"] = {}
 
         proc = subprocess.Popen(["git config -f .gitmodules -l"],
-                                cwd=os.path.join(directory, crate),
+                                cwd=os.path.join(repo_dir, repo),
                                 stdout=subprocess.PIPE, shell=True)
         (out, err) = proc.communicate()
         for line in out.decode('utf-8').splitlines():
@@ -78,7 +82,7 @@ for crate in os.listdir(directory):
         for module in modules["crates"][crate]["submodules"]:
             # Submodule latest commit date
             proc = subprocess.Popen(["git log -q -- " + modules["crates"][crate]["submodules"][module]["path"]],
-                                    cwd=os.path.join(directory, crate),
+                                    cwd=os.path.join(repo_dir, repo),
                                     stdout=subprocess.PIPE, shell=True)
             (out, err) = proc.communicate()
             for line in out.decode('utf-8').splitlines():
@@ -89,7 +93,7 @@ for crate in os.listdir(directory):
 
             # Submodule commit id
             proc = subprocess.Popen(["git submodule"],
-                                    cwd=os.path.join(directory, crate),
+                                    cwd=os.path.join(repo_dir, repo),
                                     stdout=subprocess.PIPE, shell=True)
             (out, err) = proc.communicate()
             for line in out.decode('utf-8').splitlines():
@@ -99,5 +103,3 @@ for crate in os.listdir(directory):
 
 with open('crates.json', 'w', encoding='utf-8') as f:
     json.dump(modules, f, ensure_ascii=False, indent=4)
-
-

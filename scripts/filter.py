@@ -28,15 +28,17 @@ def same_organization(url1, url2):
 
     return platform1 == platform2 and org1 == org2
 
+
 # Rebuild data by dependency
 # key is repo url
 dependencies = {}
 repositories = {}
+repositories_old = {}
 
-with open('../data/repositories.toml') as toml_file:
-    repositories = toml.load(toml_file)
+with open('repositories.toml') as toml_file:
+    repositories_old = toml.load(toml_file)
 
-with open('../data/crates.json') as json_file:
+with open('crates.json') as json_file:
     data = json.load(json_file)
     for crate, crate_info in data["crates"].items():
         if "submodules" not in crate_info:
@@ -53,6 +55,10 @@ with open('../data/crates.json') as json_file:
             if url not in dependencies:
                 dependencies[url] = {}
 
+            # import old data
+            if url in repositories_old:
+                repositories[url] = repositories_old[url]
+
             if url not in repositories:
                 repositories[url] = {"tag": "TODO"}
 
@@ -66,11 +72,11 @@ with open('../data/crates.json') as json_file:
             dependencies[url][crate]["path"] = module_info["path"]
             dependencies[url][crate]["url"] = crate_info["url"]
 
-with open('../data/submodules.json', 'w', encoding='utf-8') as f:
+with open('submodules.json', 'w', encoding='utf-8') as f:
     json.dump(dependencies, f, indent=4)
 
-# Add now URLs with TODO type
-with open('../data/repositories.toml', 'w', encoding='utf-8') as f:
+# Add new URLs with TODO type
+with open('repositories.toml', 'w', encoding='utf-8') as f:
     toml.dump(repositories, f)
 
 exit(0)
