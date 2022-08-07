@@ -43,21 +43,18 @@ Let's have a closer looks at a few representative crates.
 
 * The source is included through a git submodule.
 * The version number of the crate, `1.0.2`, is not related to the upstream version, `4.0.3`.
+* The license of the crate is `IJG` which matches the source crate (but seems [incomplete](https://github.com/mozilla/mozjpeg/blob/5c6a0f0971edf1ed3cf318d7b32308754305ac9a/LICENSE.md))
 * It always builds `mozjpeg` as a static dependency.
 
 #### curl-sys
 
+* The source is included through a git submodule.
+* The crate versions are built as the following SemVer string: `0.4.56+curl-7.83.1`, defined as `MAJOR.MINOR.PATCH+BUILD` with `BUILD` being `curl-` the upstream curl version.
+* By default, it will try to dynamically link to the system curl and openssl, and fallback on static linking. It also has `static-curl`/`static-ssl` features to enforce static linking.
+* The crate documents an `MIT` license, while curl is licensed under a custom license (but close to MIT).
+* There is [now way](https://github.com/alexcrichton/curl-rust/issues/321) to enforce dynamic linking (i.e. make the build fail if library is missing on the system).
 
-
-* The crate versions are built as the following SemVer string: `0.4.56+curl-7.83.1`, defined as `MAJOR.MINOR.PATCH+BUILD`
-* "By default, this crate will attempt to dynamically link to the system-wide libcurl and the system-wide SSL library". It has `static-curl`/`static-ssl` features to enforce static linking.
-
-
-#### openssl-src
-
-The `openssl-src` crate only contains the logic to build openssl and its sources (through a git submodule).
-
-The crate versions are built as the following SemVer string: `111.16.0+1.1.1l`, defined as `MAJOR.MINOR.PATCH+BUILD`
+**Build number in SemVer**
 
 The build metadata here is used as upstream version documentation. The major version documents the compatibility of the library (1.1.OX, 1.1.1X, etc. are compatible). The minor version is incremented at each upstream patch version bump. The patch version is used for changes in the crate not linked to an upstream version bump.
 
@@ -70,7 +67,14 @@ This means that the upstream version is:
 * Ignored by version comparison
 * Can contain various embedded version representation
 
-The `openssl-src` crate is used by `openssl-sys` (and openssl is statically built in the resulting binary) when the `vendored` feature is enabled (which it is not by default). Crates depending on `openssl-sys` or (like `native-tls`) may expose a similar flag too.
+#### openssl-src
+
+* The source is included through a git submodule.
+* The crate only contains the logic to build openssl (through a git submodule). The interface is in `openssl-sys` which depends `openssl-src` on when the `vendored` feature is enabled (disabled by default). Crates depending on `openssl-sys` or (like `native-tls`) may expose a similar flag too.
+* The crate documents an `MIT OR Apache-2.0` license, while openssl is licensed under:
+ * Apache-2.0 starting from 3.0
+ * Dual OpenSSL and SSLeay licenses before, which are in particular not compatible with the GPL. The `release/111` branch providing versions under this license is still maintained.
+* The crate versions are built as the following SemVer string: `111.16.0+1.1.1l`, defined as `MAJOR.MINOR.PATCH+BUILD`, with `BUILD` being the upstream openssl version. See `curl-sys` for details.
 
 ## Issues
 
@@ -80,7 +84,8 @@ The `openssl-src` crate is used by `openssl-sys` (and openssl is statically buil
 This can be a source of problems, especially because of the lack of visibility over the included code in terms of:
 
 - *Presence*: It is not always easy to even know if a library was statically linked as it does not appear in the crates tree, nor `cargo-auditable` data.
-- *Licenses*: They are often different from the Rust source, and not easily discoverable. For example, `cargo deny check licenses` cannot check them. A good example is the OpenSSL licence for versions before 3.0, which is incompatible with GPL.
+- *Licenses*: The core problem here is that we get a crate with a license documented in `Cargo.toml` but which sometimes is different from the one applied to the library embedded in the crate's source.
+In this case they are not easily discoverable, for example, `cargo deny check licenses` cannot check them. A good example is the OpenSSL licence for versions before 3.0, which is incompatible with GPL.
 - *Vulnerabilities*: Except for dedicated source crates (`openssl-src` has [RustSec advisories](https://rustsec.org/packages/openssl-src.html)), there is no visibility over vulnerabilities affecting the included library in the usual Rust tooling (`cargo-audit` and `cargo-deny`)
 - *Versioning*: There is no easy visibility over the upstream version.
 - *Trust*: The code is included from external git repositories, written by unidentified people, and is not visible in tooling like `cargo-supply-chain`, `rust-audit` or `cargo-crev`
@@ -130,6 +135,8 @@ This would allow:
 - To file RustSec advisories for vulnerabilities in upstream libraries (like already done for `openssl-src`). We could automate detection based on CVEs for common libraries, and integrate directly with `cargo-audit` and `cargo-deny`
 
 #### Question
+
+does a crate licnese need to match all files included in the crate?
 
 * Use submodules or not? a repo with submodules is no longer defined by its commit hash, which makes reproducibility a
 lot harder. Also, it turns out that C/C++ projects often have different contents in git compared to
