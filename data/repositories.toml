@@ -1,17 +1,320 @@
-["https://github.com/dhall-lang/dhall-lang"]
-tag = "specs"
+["https://github.com/libevent/libevent"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/rust-embedded/book"]
+tag = "data"
+
+["https://gitlab.freedesktop.org/wayland/wayland-protocols"]
+tag = "tests"
+
+["https://gitlab.freedesktop.org/wlroots/wlr-protocols"]
+tag = "data"
+
+["https://github.com/kde/plasma-wayland-protocols"]
+tag = "data"
+
+["https://github.com/webassembly/testsuite"]
+tag = "tests"
+
+["https://github.com/sass/libsass"]
+tag = "lib"
+lang = "Cpp"
+
+["https://github.com/rust-vmm/rust-vmm-ci"]
+tag = "tests"
+
+["https://github.com/tomaka/android-rs-glue"]
+tag = "lib"
+lang = "Rust"
+
+["https://github.com/webassembly/wasm-c-api"]
+tag = "lib"
+lang = "Rust"
+
+["https://github.com/webassembly/wasi"]
+tag = "lib"
+lang = "Rust"
+
+["https://github.com/webassembly/wasi-nn"]
+tag = "lib"
+lang = "Rust"
+
+["https://github.com/webassembly/wasi-crypto"]
+tag = "lib"
+lang = "Rust"
+
+["https://github.com/boto/botocore"]
+tag = "lib"
+lang = "Python"
+
+["https://github.com/html5lib/html5lib-tests"]
+tag = "tests"
+
+["https://github.com/ygg01/xml5lib-tests"]
+tag = "tests"
+
+["https://github.com/google/boringssl"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/google/souper"]
+tag = "lib"
+lang = "Cpp"
+
+["https://github.com/lmdb/lmdb"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/lz4/lz4"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/pingcap/grpc"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/jasongross/coq-scripts"]
+tag = "data"
+
+["https://github.com/thery/coqprime"]
+tag = "data"
+
+["https://github.com/github/gemoji"]
+tag = "data"
+
+["https://github.com/khronosgroup/spirv-headers"]
+tag = "tests"
+
+["https://github.com/drtimothyaldendavis/suitesparse"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/reference-lapack/lapack"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/xz-mirror/xz"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/libssh2/libssh2"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/jemalloc/jemalloc"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/copies/sqlite"]
+tag = "lib"
+lang = "C"
+comment = "Non official repository"
+
+["https://github.com/lieff/minimp3"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/publicsuffix/list"]
+tag = "data"
+
+["https://github.com/openvinotoolkit/openvino"]
+tag = "lib"
+lang = "Cpp"
+
+["https://github.com/lemire/croaringunitybuild"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/project-serum/serum-dex"]
+tag = "lib"
+lang = "Rust"
+
+["https://github.com/project-serum/swap"]
+tag = "lib"
+lang = "Rust"
+
+["https://github.com/project-serum/stake"]
+tag = "lib"
+lang = "Rust"
+
+["https://github.com/armaniferrante/auction-house"]
+tag = "lib"
+lang = "Rust"
+
+["https://github.com/openresty/luajit2"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/swagger-api/swagger-ui"]
+tag = "lib"
+lang = "JS"
+
+["https://github.com/facebook/zstd"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/libusb/libusb"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/gtk-rs/gir"]
+tag = "lib"
+lang = "Rust"
+
+["https://github.com/gtk-rs/gir-files"]
+tag = "lib"
+lang = "Rust"
+
+["https://github.com/tc39/test262-parser-tests"]
+tag = "tests"
+
+["https://github.com/cloudflare/zlib"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/mozilla/mozjpeg"]
+tag = "lib"
+lang = "C"
+
+["git@github.com:protocolbuffers/protobuf"]
+tag = "tests"
+
+["https://github.com/curl/curl"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/robbepop/wasm_kernel"]
+tag = "tests"
+
+["https://github.com/web-platform-tests/wpt"]
+tag = "tests"
+
+["https://github.com/tinycc/tinycc"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/kkos/oniguruma"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/maxmind/maxmind-db"]
+tag = "tests"
+
+["https://github.com/khronosgroup/vulkan-headers"]
+tag = "data"
+
+["https://github.com/jedisct1/libsodium"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/google/snappy"]
+tag = "lib"
+lang = "Cpp"
+
+["https://github.com/facebook/rocksdb"]
+tag = "lib"
+lang = "Cpp"
+
+["https://github.com/libusb/hidapi"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/benesch/librdkafka"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/khronosgroup/opengl-registry"]
+tag = "tests"
+
+["https://github.com/khronosgroup/egl-registry"]
+tag = "tests"
+
+["https://github.com/khronosgroup/webgl"]
+tag = "tests"
+
+["https://github.com/google/angle"]
+tag = "lib"
+lang = "Cpp"
+
+["https://github.com/madler/zlib"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/zlib-ng/zlib-ng"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/aflplusplus/aflplusplus"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/cyan4973/xxhash"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/harfbuzz/harfbuzz"]
+tag = "lib"
+lang = "C"
 
 ["https://github.com/glennrp/libpng"]
 tag = "lib"
 lang = "C"
 
-["https://github.com/ricardoquesada/libfreetype"]
+["https://github.com/libsdl-org/sdl"]
 tag = "lib"
 lang = "C"
 
-["https://aomedia.googlesource.com/aom"]
+["https://github.com/nghttp2/nghttp2"]
 tag = "lib"
 lang = "C"
+
+["https://github.com/libgit2/libgit2"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/google/honggfuzz"]
+tag = "tests"
+
+["https://github.com/microsoft/mimalloc"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/openssl/openssl"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/kilian/electron-to-chromium"]
+tag = "data"
+
+["https://github.com/chicoxyzzy/node-releases"]
+tag = "data"
+
+["https://github.com/fyrd/caniuse"]
+tag = "lib"
+lang = "JS"
+
+["https://github.com/aomediacodec/av1-avif"]
+tag = "tests"
+
+["https://github.com/link-u/avif-sample-images"]
+tag = "data"
+
+["https://github.com/gabomdq/sdl_gamecontrollerdb"]
+tag = "lib"
+lang = "Python"
+
+["https://github.com/google/brotli"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/mjansson/rpmalloc"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/microsoft/snmalloc"]
+tag = "lib"
+lang = "Cpp"
 
 ["https://github.com/princemaple/elixir-sublime-syntax"]
 tag = "data"
@@ -76,16 +379,10 @@ tag = "data"
 ["https://github.com/russcloak/sublimepuppet"]
 tag = "data"
 
-["https://github.com/wadetb/sublime-text-advanced-csv"]
-tag = "data"
-
 ["https://github.com/sonph/onehalf"]
 tag = "data"
 
 ["https://github.com/babel/babel-sublime"]
-tag = "data"
-
-["https://github.com/guillermooo/dart-sublime-bundle"]
 tag = "data"
 
 ["https://github.com/hoest/sublimetext-fsharp"]
@@ -112,9 +409,6 @@ tag = "data"
 ["https://github.com/tvi/sublime-arm-assembly"]
 tag = "data"
 
-["https://github.com/caos21/syslog-syntax"]
-tag = "data"
-
 ["https://github.com/vcamx/protobuf-syntax-highlighting"]
 tag = "data"
 
@@ -131,9 +425,6 @@ tag = "data"
 tag = "data"
 
 ["https://github.com/jezcope/org.tmbundle"]
-tag = "data"
-
-["https://github.com/wuub/requirementstxt"]
 tag = "data"
 
 ["https://github.com/zaynali53/dotenv"]
@@ -220,6 +511,9 @@ tag = "data"
 ["https://github.com/leanprover/vscode-lean"]
 tag = "data"
 
+["https://github.com/paulmillr/livescript.tmbundle"]
+tag = "data"
+
 ["https://github.com/ziglang/sublime-zig-language"]
 tag = "data"
 
@@ -229,336 +523,116 @@ tag = "data"
 ["https://github.com/theclams/systemverilog"]
 tag = "data"
 
-["https://github.com/nodejs/node"]
-tag = "lib"
-lang = "Cpp"
+["https://github.com/vidann1/visual-studio-dark-plus"]
+tag = "data"
 
-["https://github.com/google/boringssl"]
-tag = "lib"
-lang = "C"
+["https://github.com/davidhq/sublimeethereum"]
+tag = "data"
 
-["https://github.com/harfbuzz/harfbuzz"]
-tag = "lib"
-lang = "C"
+["https://github.com/carsonoid/sublime_man_page_support"]
+tag = "data"
 
-["https://github.com/madler/zlib"]
+["https://github.com/keith-hall/http-request-response-syntax"]
+tag = "data"
+
+["https://github.com/ioncodes/llvm.tmbundle"]
+tag = "data"
+
+["https://github.com/slim-template/ruby-slim.tmbundle"]
+tag = "data"
+
+["https://github.com/follesoe/sublime-racket"]
+tag = "data"
+
+["https://github.com/tosher/mediawiker"]
+tag = "data"
+
+["https://github.com/elmuso/dartlight"]
+tag = "data"
+
+["https://github.com/zogwarg/sublimejq"]
+tag = "data"
+
+["https://github.com/victor-gp/cmd-help-sublime-syntax"]
+tag = "data"
+
+["https://github.com/ua-parser/uap-core"]
 tag = "lib"
-lang = "C"
+lang = "Javascript"
 
 ["https://github.com/webassembly/wabt"]
 tag = "lib"
 lang = "Cpp"
 
-["https://github.com/lieff/minimp3"]
-tag = "lib"
-lang = "C"
+["https://github.com/sethlopezme/inspiredgithub.tmtheme"]
+tag = "data"
 
-["https://github.com/ethereum/tests"]
-tag = "tests"
+["https://github.com/kkga/spacegray"]
+tag = "data"
 
-["https://github.com/jp-ellis/rust-skiplist"]
-tag = "lib"
-lang = "Rust"
+["https://github.com/38/plotters-doc-data"]
+tag = "data"
 
-["https://github.com/wojciechmula/sse4-strstr"]
+["https://github.com/z3prover/z3"]
 tag = "lib"
 lang = "Cpp"
 
-["https://github.com/cloudflare/zlib"]
+["https://github.com/json-schema-org/json-schema-test-suite"]
+tag = "tests"
+
+["https://chromium.googlesource.com/chromium/src/tools/clang"]
 tag = "lib"
 lang = "C"
 
-["https://github.com/boto/botocore"]
+["https://chromium.googlesource.com/chromium/src/base/trace_event/common"]
+tag = "lib"
+lang = "C"
+
+["https://chromium.googlesource.com/chromium/src/third_party/jinja2"]
+tag = "lib"
+lang = "C"
+
+["https://chromium.googlesource.com/chromium/src/third_party/markupsafe"]
+tag = "lib"
+lang = "C"
+
+["https://chromium.googlesource.com/chromium/src/third_party/zlib"]
+tag = "lib"
+lang = "C"
+
+["git@github.com:hoodie/notify-rust"]
+tag = "lib"
+lang = "Rust"
+
+["https://github.com/zeromq/libzmq"]
+tag = "lib"
+lang = "Cpp"
+
+["https://github.com/bitcoin/secp256k1"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/timniederhausen/gn-build"]
 tag = "lib"
 lang = "Python"
 
-["https://github.com/rust-lang/libbacktrace"]
-tag = "lib"
-lang = "Rust"
-
-["https://github.com/dariusk/corpora"]
-tag = "data"
-
-["https://github.com/github/gemoji"]
-tag = "data"
-
-["https://github.com/adobe-type-tools/agl-aglfn"]
-tag = "data"
-
-["https://github.com/khronosgroup/opengl-registry"]
-tag = "tests"
-
-["https://github.com/khronosgroup/egl-registry"]
-tag = "tests"
-
-["https://github.com/khronosgroup/webgl"]
-tag = "tests"
-
-["https://github.com/google/angle"]
-tag = "lib"
-lang = "Cpp"
-
-["https://github.com/webassembly/binaryen"]
-tag = "lib"
-lang = "Cpp"
-
-["https://github.com/html5lib/html5lib-tests"]
-tag = "tests"
-
-["https://github.com/xianyi/openblas"]
+["https://github.com/samtools/htslib"]
 tag = "lib"
 lang = "C"
 
-["https://github.com/khronosgroup/openxr-sdk"]
+["https://github.com/apache/arrow-testing"]
 tag = "tests"
 
-["https://github.com/aomediacodec/av1-avif"]
-tag = "tests"
-
-["git://git.ghostscript.com/mujs"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/cyan4973/xxhash"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/p-h-c/phc-winner-argon2"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/ygg01/xml5lib-tests"]
+["https://github.com/apache/parquet-testing"]
 tag = "tests"
 
 ["https://github.com/google/oboe"]
 tag = "lib"
 lang = "Cpp"
 
-["https://github.com/gtk-rs/gir"]
-tag = "lib"
-lang = "Rust"
-
-["https://github.com/gtk-rs/gir-files"]
-tag = "lib"
-lang = "Rust"
-
-["https://github.com/khronosgroup/spirv-headers"]
-tag = "tests"
-
-["https://github.com/drtimothyaldendavis/suitesparse"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/copies/sqlite"]
-tag = "lib"
-lang = "C"
-comment = "Non official repository"
-
-["https://github.com/tc39/test262-parser-tests"]
-tag = "tests"
-
-["https://github.com/eggert/tz"]
-tag = "data"
-
-["https://github.com/publicsuffix/list"]
-tag = "data"
-
-["https://github.com/jasongross/coq-scripts"]
-tag = "data"
-
-["https://github.com/thery/coqprime"]
-tag = "data"
-
-["https://github.com/lmdb/lmdb"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/webassembly/testsuite"]
-tag = "tests"
-
-["https://github.com/webassembly/wasm-c-api"]
-tag = "lib"
-lang = "Rust"
-
-["https://github.com/webassembly/wasi"]
-tag = "lib"
-lang = "Rust"
-
-["https://github.com/webassembly/wasi-nn"]
-tag = "lib"
-lang = "Rust"
-
-["https://github.com/webassembly/wasi-crypto"]
-tag = "lib"
-lang = "Rust"
-
-["https://gitlab.freedesktop.org/wayland/wayland-protocols"]
-tag = "tests"
-
-["https://github.com/swaywm/wlr-protocols"]
-tag = "tests"
-
-["https://github.com/xz-mirror/xz"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/andlabs/libui"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/microsoft/snmalloc"]
-tag = "lib"
-lang = "Cpp"
-
-["https://github.com/jaynus/spirv-reflect"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/gfx-rs/rspirv"]
-tag = "lib"
-lang = "Rust"
-
-["https://github.com/tensorflow/tensorflow"]
-tag = "lib"
-lang = "Cpp"
-
-["https://github.com/pingcap/grpc"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/hdfgroup/hdf5"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/khronosgroup/spirv-tools"]
-tag = "tests"
-
-["https://github.com/khronosgroup/glslang"]
-tag = "tests"
-
-["https://github.com/couchbase/libcouchbase"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/godotnativetools/godot_headers"]
-tag = "tests"
-
 ["https://github.com/rust-lang/rust"]
 tag = "lib"
 lang = "Rust"
-
-["https://github.com/datastax/cpp-driver"]
-tag = "lib"
-lang = "Cpp"
-
-["https://github.com/stedolan/jq"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/openssl/openssl"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/googleapis/googleapis"]
-tag = "data"
-
-["https://github.com/openvinotoolkit/openvino"]
-tag = "lib"
-lang = "Cpp"
-
-["https://github.com/mjansson/rpmalloc"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/netex-cen/netex"]
-tag = "data"
-
-["https://github.com/ocornut/imgui"]
-tag = "lib"
-lang = "Cpp"
-
-["https://github.com/xi-editor/syntect-resources"]
-tag = "data"
-
-["https://github.com/reference-lapack/lapack"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/kinetiknz/cubeb"]
-tag = "lib"
-lang = "Cpp"
-
-["https://github.com/curl/curl"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/unicode-cldr/cldr-numbers-full"]
-tag = "data"
-
-["https://github.com/sass/sass-spec"]
-tag = "tests"
-
-["https://github.com/google/honggfuzz"]
-tag = "tests"
-
-["https://github.com/copies/hotspot"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/khronosgroup/gltf-sample-models"]
-tag = "tests"
-
-["https://github.com/zeux/meshoptimizer"]
-tag = "lib"
-lang = "Cpp"
-
-["https://github.com/samtools/htslib"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/rust-embedded/book"]
-tag = "data"
-
-["https://github.com/rust-analyzer/rust-analyzer"]
-tag = "lib"
-lang = "Rust"
-
-["https://github.com/z3prover/z3"]
-tag = "lib"
-lang = "Cpp"
-
-["https://github.com/zeromq/libzmq"]
-tag = "lib"
-lang = "Cpp"
-
-["https://github.com/facebook/zstd"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/webview/webview"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/project-everest/hacl-star"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/google/wycheproof"]
-tag = "tests"
-
-["https://github.com/google/protobuf"]
-tag = "lib"
-lang = "Cpp"
-
-["https://github.com/armmbed/mbedtls"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/khronosgroup/vulkan-headers"]
-tag = "data"
-
-["https://github.com/spdx/license-list-data"]
-tag = "data"
 
 ["https://github.com/lemire/fast_float_supplemental_tests"]
 tag = "tests"
@@ -569,305 +643,96 @@ tag = "tests"
 ["https://github.com/rurban/smhasher"]
 tag = "tests"
 
-["https://github.com/leo-yuriev/t1ha"]
-tag = "lib"
-lang = "C"
-
 ["https://github.com/google/highwayhash"]
 tag = "lib"
 lang = "Cpp"
 
-["https://github.com/google/brotli"]
+["https://github.com/wangyi-fudan/wyhash"]
 tag = "lib"
 lang = "C"
 
-["https://github.com/tomaka/android-rs-glue"]
-tag = "lib"
-lang = "Rust"
-
-["https://github.com/jedisct1/libsodium"]
+["https://github.com/avaneev/komihash"]
 tag = "lib"
 lang = "C"
 
-["https://github.com/libssh2/libssh2"]
+["https://github.com/avaneev/prvhash"]
 tag = "lib"
 lang = "C"
 
-["https://github.com/copies/superlu"]
+["https://github.com/gzm55/hash-garage"]
 tag = "lib"
 lang = "C"
 
-["https://github.com/posborne/cmsis-svd"]
+["https://github.com/jonmaiga/mx3"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/tinypeng/pengyhash"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/eggert/tz"]
 tag = "data"
 
-["https://github.com/bel2125/civetweb"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/google/snappy"]
-tag = "lib"
-lang = "Cpp"
-
-["https://github.com/facebook/rocksdb"]
-tag = "lib"
-lang = "Cpp"
-
-["https://github.com/lz4/lz4"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/json-schema-org/json-schema-test-suite"]
+["https://github.com/khronosgroup/glslang"]
 tag = "tests"
-
-["https://github.com/libgit2/libgit2"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/nghttp2/nghttp2"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/roblox/roact"]
-tag = "lib"
-lang = "Lua"
-
-["https://github.com/roblox/testez"]
-tag = "lib"
-lang = "Lua"
-
-["https://github.com/lpghatguy/roblox-lua-promise"]
-tag = "lib"
-lang = "Lua"
-
-["https://github.com/osyrisrblx/t"]
-tag = "lib"
-lang = "Lua"
-
-["https://github.com/reselim/flipper"]
-tag = "lib"
-lang = "Lua"
-
-["https://github.com/rust-vmm/rust-vmm-ci"]
-tag = "tests"
-
-["https://github.com/gpuopen-librariesandsdks/vulkanmemoryallocator"]
-tag = "lib"
-lang = "Cpp"
-
-["https://gitlab.matrix.org/matrix-org/olm"]
-tag = "lib"
-lang = "Cpp"
-
-["https://github.com/kkos/oniguruma"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/ua-parser/uap-core"]
-tag = "lib"
-lang = "Javascript"
-
-["https://anongit.freedesktop.org/git/uchardet/uchardet"]
-tag = "TODO"
-
-["https://github.com/libusb/libusb"]
-tag = "lib"
-lang = "C"
-
-["https://chromium.googlesource.com/webm/libwebp"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/zlib-ng/zlib-ng"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/bitcoin/secp256k1"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/nodejs/http-parser"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/gabomdq/sdl_gamecontrollerdb"]
-tag = "lib"
-lang = "Python"
-
-["https://github.com/oracle/odpi"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/mustache/spec"]
-tag = "tests"
-
-["https://github.com/emk/rust-musl-builder"]
-tag = "tests"
-
-["https://github.com/sethlopezme/inspiredgithub.tmtheme"]
-tag = "data"
-
-["https://github.com/kkga/spacegray"]
-tag = "data"
-
-["https://github.com/bitcoin/bitcoin"]
-tag = "lib"
-lang = "Cpp"
-
-["https://github.com/mlabbe/nativefiledialog"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/nanomsg/nng"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/microsoft/mimalloc"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/libusb/hidapi"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/hoedown/hoedown"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/jemalloc/jemalloc"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/lemire/croaringunitybuild"]
-tag = "TODO"
-
-["https://chromium.googlesource.com/v8/v8"]
-tag = "TODO"
-
-["https://chromium.googlesource.com/chromium/src/tools/clang"]
-tag = "TODO"
-
-["https://chromium.googlesource.com/chromium/src/base/trace_event/common"]
-tag = "TODO"
-
-["https://chromium.googlesource.com/chromium/src/third_party/jinja2"]
-tag = "TODO"
-
-["https://chromium.googlesource.com/chromium/src/third_party/markupsafe"]
-tag = "TODO"
-
-["https://chromium.googlesource.com/chromium/src/third_party/zlib"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/amzn/hawktracer"]
-tag = "tests"
-
-["https://github.com/openresty/luajit2"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/bytecodealliance/wasmtime"]
-tag = "lib"
-lang = "Rust"
-
-["https://github.com/webassembly/spec"]
-tag = "tests"
-
-["https://github.com/mm2/little-cms"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/maxmind/maxmind-db"]
-tag = "tests"
-
-["git@github.com:hoodie/notify-rust"]
-tag = "TODO"
-
-["https://github.com/aflplusplus/aflplusplus"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/the-tcpdump-group/libpcap"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/bill-gray/pdcurses"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/libbpf/libbpf"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/ebiggers/libdeflate"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/libevent/libevent"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/libffi/libffi"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/sel4/sel4"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/mozilla/mozjpeg"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/google/souper"]
-tag = "lib"
-lang = "Cpp"
-
-["https://github.com/mitls/hacl-c"]
-tag = "TODO"
-comment = "Unavailable"
-
-["https://github.com/sass/libsass"]
-tag = "lib"
-lang = "Cpp"
 
 ["https://github.com/xiph/opus"]
 tag = "lib"
 lang = "C"
 
-["https://github.com/joewalnes/reconnecting-websocket"]
+["https://github.com/rust-windowing/android-rs-glue"]
 tag = "lib"
-lang = "Javascript"
+lang = "Rust"
 
-["https://github.com/components/highlightjs"]
-tag = "lib"
-lang = "Javascript"
-
-["https://github.com/cmatsuoka/libxmp"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/pqclean/pqclean"]
-tag = "lib"
-lang = "C"
-
-["https://github.com/timniederhausen/gn-build"]
-tag = "lib"
-lang = "Python"
-
-["https://github.com/w3c/rdf-tests"]
+["https://github.com/amzn/hawktracer"]
 tag = "tests"
 
-["git://git.kernel.org/pub/scm/bluetooth/sbc"]
+["https://github.com/xi-editor/syntect-resources"]
+tag = "data"
+
+["https://github.com/khronosgroup/spirv-reflect"]
 tag = "lib"
 lang = "C"
 
-["https://github.com/edenhill/librdkafka"]
+["https://github.com/khronosgroup/spirv-tools"]
+tag = "lib"
+lang = "Cpp"
+
+["https://github.com/p-h-c/phc-winner-argon2"]
 tag = "lib"
 lang = "C"
 
-["./robin_cli"]
-tag = "unknown"
+["https://github.com/spdx/license-list-data"]
+tag = "data"
 
-["../../Immediate-Mode-UI/Nuklear"]
-tag = "unknown"
+["https://github.com/xianyi/openblas"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/dariusk/corpora"]
+tag = "data"
+
+["https://github.com/mustache/spec"]
+tag = "tests"
+
+["https://github.com/piscisaureus/wepoll"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/ethereum/tests"]
+tag = "tests"
+
+["https://github.com/nigeltao/parse-number-fxx-test-data"]
+tag = "tests"
+
+["https://aomedia.googlesource.com/aom"]
+tag = "lib"
+lang = "C"
+
+["https://github.com/tensorflow/tensorflow"]
+tag = "lib"
+lang = "Cpp"
+
+["https://github.com/unicode-cldr/cldr-numbers-full"]
+tag = "data"

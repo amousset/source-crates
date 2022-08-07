@@ -11,7 +11,6 @@ export GIT_TERMINAL_PROMPT=0
 #cd 2022-08-06-020034
 
 # data/crates.csv comes from crates.io db dump
-# at least 100k downloads
 for crate in $(xsv select downloads,name,repository ./data/crates.csv | rg "^(\d{6}).*"); do
   mkdir -p crates
   mkdir -p repos
@@ -32,4 +31,3 @@ for crate in $(xsv select downloads,name,repository ./data/crates.csv | rg "^(\d
     echo $repo_hash > crates/$name
   fi
 done
-

@@ -2,46 +2,60 @@
 
 It is a good idea to use crates.io as a repository for C/C++ dependencies used by Rust library? It's already massively used, and we need to deal with it.
 
-make it
-easier to import C/C++ code in a secure and reliable manner and keep it up-to-date
+make it easier to import C/C++ code in a secure and reliable manner and keep it up-to-date
 
 This article investigates the Rust crates including third-party code (often C/C++ libraries) statically linked into Rust binaries. The goal is to explore the current situation and the
 challenges it creates, and to propose some possible improvements.
 
-There are two main ways to include third-party dependency libraries into a crate source (and
-resulting binary):
-
 ## Current state
 
-To get an idea to which extend this pattern is used, let's explore crates.io content with an analysis of the crates with more than 100k downloads on 2022-08-07 (the 4,7k top crates), see [`methodology`](https://github.com/amousset/source-crates/blob/main/methodology.md) for more details.
+### Overview
 
-There are currently 70 C/C++ native libraries included in the top 4,7k crates (included with submodules, not counting those directly copied into the crate source). Some of them are highly used, like `libz-sys` with 20M downloads en 46 reverse dependencies, or `libgit2-sys` with 11M downloads).
+To get an idea to which extend this pattern is used, let's explore crates.io content with an analysis of the crates with more than 100k downloads on 2022-08-07 (the 4,7k top crates), see the  [`methodology`](https://github.com/amousset/source-crates/blob/main/methodology.md) for more details.
 
-* 6 crates including a C/C++ library currently have the `-src` suffix in their name (`boringssl-src`, `openblas-src`, `sqlite3-src`, `openssl-src`, `zeromq-src` and `luajit-src`). A total of 47 crates in crates.io have the `-src` suffix.
+There are currently 70 C/C++ native libraries included in 58 crates from the top 4,7k crates (included with submodules, not counting those directly copied into the crate source). Some of them are highly used, like `libz-sys` with 20M downloads en 46 reverse dependencies, or `libgit2-sys` with 11M downloads).
 
-* 38 crates including a C/C++ library are `-sys` crates that include a library directly (`libevent-sys`, `pcre2-sys`, `lmdb-sys`, `lzma-sys`, `lmdb-rkv-sys`, `croaring-sys`, `openvino-sys`, `zstd-sys`, `cloudflare-zlib-sys`, `mozjpeg-sys`, `boring-sys`, `libsodium-sys`, `librocksdb-sys`, `libz-sys`, `libnghttp2-sys`, `libgit2-sys`, `sdl2-sys`, `curl-sys`, `rpmalloc-sys`, `sass-sys`, `rdkafka-sys`, `snmalloc-sys`, `wabt-sys`, `z3-sys`, `ckb-librocksdb-sys`, `libssh2-sys`, `libbpf-sys`, `oboe-sys`, `lz4-sys`, `tikv-jemalloc-sys`, `fasthash-sys`, `libusb1-sys`, `shaderc-sys`, `minimp3-sys`, `jemalloc-sys`, `liblmdb-sys`, `aom-sys`, `brotli-sys`). A total of 2288 crates in crates.io have the `-sys` suffix.
+Among these 58 crates:
 
-* TOOD others ??
+* 6 have the `-src` suffix in their name (`boringssl-src`, `openblas-src`, `sqlite3-src`, `openssl-src`, `zeromq-src` and `luajit-src`). A total of 47 crates in crates.io have the `-src` suffix.
+
+* 38 are `-sys` crates that include a library directly (`libevent-sys`, `pcre2-sys`, `lmdb-sys`, `lzma-sys`, `lmdb-rkv-sys`, `croaring-sys`, `openvino-sys`, `zstd-sys`, `cloudflare-zlib-sys`, `mozjpeg-sys`, `boring-sys`, `libsodium-sys`, `librocksdb-sys`, `libz-sys`, `libnghttp2-sys`, `libgit2-sys`, `sdl2-sys`, `curl-sys`, `rpmalloc-sys`, `sass-sys`, `rdkafka-sys`, `snmalloc-sys`, `wabt-sys`, `z3-sys`, `ckb-librocksdb-sys`, `libssh2-sys`, `libbpf-sys`, `oboe-sys`, `lz4-sys`, `tikv-jemalloc-sys`, `fasthash-sys`, `libusb1-sys`, `shaderc-sys`, `minimp3-sys`, `jemalloc-sys`, `liblmdb-sys`, `aom-sys`, `brotli-sys`). A total of 2288 crates in crates.io have the `-sys` suffix.
+
+* 2 have a `_sys` suffix (`audiopus_sys` and `onig_sys`), i.e. almost-`-sys` crates.
+
+* 1 has an `-ffi` suffix (`wepoll-ffi`), i.e. a `-sys` variant.
+
+* 12 have no specific name pattern (`afl`, `hidapi`, `khronos_api`, `mimalloc`, `parity-secp256k1`, `rust-htslib`, `rusty_v8`, `souper-ir`, `spirv-reflect`, `sprs`, `tflite`, `twox-hash`)
 
 Two main patterns appear:
 
-- dedicated crates (usually containing `-src` in the name). A widely used example is `openssl-src` (used as `openssl-sys` dependency if the `vendored` feature is enabled).
+- dedicated crates containing `-src` in the name. A widely used example is `openssl-src` (used as `openssl-sys` dependency if the `vendored` feature is enabled).
 - normal [`-sys` crates](https://doc.rust-lang.org/cargo/reference/build-scripts.html#-sys-packages) which are able to compile the library they are providing an interface for, either by default or
-  only when enabled by a feature flag (see this [blog post](https://kornel.ski/rust-sys-crate) blog posts for details). A widely used example is `curl-sys`.
+  only when enabled by a feature flag (see this [blog post](https://kornel.ski/rust-sys-crate) for details on how it's done). A widely used example is `curl-sys`.
 
-Sometimes the code is copied into the repository, sometimes it is configured as a git submodule. In any case, the source becomes part of the the crate uploaded to the registry.
+Note that we only analyzed the crates containing submodules, but sometimes the code is vendored directly into the repository, like for example with `freetype-sys` which has a copy of freetype2 sources. In any case, the source becomes part of the the crate uploaded to the registry, and sometimes of the produced binaries.
 
-### In depth
+### Case studies
 
-Let's study two of these "source crates" among the most used to get an overview of currently used patterns.
+Let's have a closer looks at a few representative crates.
+
+#### mozjpeg-sys
+
+* The source is included through a git submodule.
+* The version number of the crate, `1.0.2`, is not related to the upstream version, `4.0.3`.
+* It always builds `mozjpeg` as a static dependency.
 
 #### curl-sys
 
 
 
+* The crate versions are built as the following SemVer string: `0.4.56+curl-7.83.1`, defined as `MAJOR.MINOR.PATCH+BUILD`
+* "By default, this crate will attempt to dynamically link to the system-wide libcurl and the system-wide SSL library". It has `static-curl`/`static-ssl` features to enforce static linking.
+
+
 #### openssl-src
 
-One of the most used crate embedding a static library is `openssl-src`. It is an example of a dedicated crate, i.e. it only contains the logic to build openssl and its sources (through a git submodule).
+The `openssl-src` crate only contains the logic to build openssl and its sources (through a git submodule).
 
 The crate versions are built as the following SemVer string: `111.16.0+1.1.1l`, defined as `MAJOR.MINOR.PATCH+BUILD`
 
@@ -57,7 +71,6 @@ This means that the upstream version is:
 * Can contain various embedded version representation
 
 The `openssl-src` crate is used by `openssl-sys` (and openssl is statically built in the resulting binary) when the `vendored` feature is enabled (which it is not by default). Crates depending on `openssl-sys` or (like `native-tls`) may expose a similar flag too.
-
 
 ## Issues
 
@@ -107,7 +120,6 @@ This could be improved by additionnal cargo metadata.
 
 - Split third-party code inclusion into dedicated separate crates, and name them with the `-src` suffix
 - Use the upstream version as crate build version. This means that the crate version needs to be incremented for each upstream update (as already done for `openssl-src`). The problem is that it makes version requirements in dependant crates less readable (as the upstream version is not part of it). It could a plus though, as a lot of projects don't use semver versionning.
-- Use git submodules when possible as it makes upstream tracking easier
 - Add a reference to the included code in the cargo metadata TODO
 - Use a common behavior for static linking in libraries, including feature naming
 
@@ -116,6 +128,17 @@ This would allow:
 - To improve discoverability and help library authors who want to allow statically linking a dependency
 - To know when a static library is included, directly from `cargo-tree`
 - To file RustSec advisories for vulnerabilities in upstream libraries (like already done for `openssl-src`). We could automate detection based on CVEs for common libraries, and integrate directly with `cargo-audit` and `cargo-deny`
+
+#### Question
+
+* Use submodules or not? a repo with submodules is no longer defined by its commit hash, which makes reproducibility a
+lot harder. Also, it turns out that C/C++ projects often have different contents in git compared to
+release tarballs, and require different procedures to build from git vs release tarballs.
+
+Hmm, how should the version synchronization between -sys and -src crates be handled? Is there a way
+to specify "I want -src version X" even though you don't depend on it directly? If not, should -sys
+and src crates be published together and always have the same version to allow selecting a specific
+version of -src crate?
 
 #### Limitations / Cons
 
@@ -126,7 +149,6 @@ This would allow:
 according to the semver spec there is no defined ordering for versions that only differ by build metadata. Meaning it might not be possible to match on some build versions but not others, which
 would be necessary for RustSec. But that's details.
 
-
 ### Improve tooling
 
 Cargo-based tooling could get some knowledge to detect `-src` crates and implement special handling (extract upstream version, etc.).
@@ -135,46 +157,9 @@ This could allow implementing correct [SBOM](https://www.cisa.gov/sbom) (like [c
 
 automatic import of new releases, automatic import of CVEs to RustSec, etc
 
-
-# NOTES
-
-advisory unmaintained pour https://github.com/nodejs/http-parser
-https://github.com/rustsec/advisory-db/pull/1124
-https://internals.rust-lang.org/t/pre-rfc-cargo-features-for-configuring-sys-crates/12431
-https://amousset.github.io/source-crates/ 
-https://rust-lang.github.io/rfcs/2856-project-groups.html
-https://internals.rust-lang.org/t/how-to-audit-and-improve-rust-crates-eco-system-for-security-in-general/16699 
-
-https://www.reddit.com/r/rust/comments/n43pcb/psa_libzsys_on_musl_no_longer_links_statically_by/
-
-- crates versions and features: use `rust-audit`
-
-- compiler version:
-
-  - Easily accessible with [rustc_version_runtime](https://crates.io/crates/rustc_version_runtime)
-  - Always there (in non-stripped binaries):
-
-```
-$ strings your_executable | grep 'rustc version'
-clang LLVM (rustc version 1.51.0 (2fd73fabe 2021-03-23))
-```
-
-
-
-I'm also not convinced that submodules are a good idea. There are a lot of pitfalls around them; for
-one, a repo with submodules is no longer defined by its commit hash, which makes reproducibility a
-lot harder. Also, it turns out that C/C++ projects often have different contents in git compared to
-release tarballs, and require different procedures to build from git vs release tarballs.
-
 another thing I've lamented is how much e.g. curl versions lag behind upstream, even in case of
 critical security fixes. We could build automated infrastructure for updating library versions: new
 release tarballs could be pulled automatically, and with a bit of work even published automatically:
 we could run crater on the dependencies of the crate before and after the update, if all tests pass
 then publish it without requiring manual review. I believe @HeroicKatora has been working on a
 "crater for your dependencies" kind of tool
-
-Hmm, how should the version synchronization between -sys and -src crates be handled? Is there a way
-to specify "I want -src version X" even though you don't depend on it directly? If not, should -sys
-and src crates be published together and always have the same version to allow selecting a specific
-version of -src crate?
-
