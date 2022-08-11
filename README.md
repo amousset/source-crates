@@ -1,14 +1,14 @@
 # External source crates
 
-This post investigates the Rust crates including third-party code (often C/C++ libraries) statically linked into Rust binaries. The goal is to explore the current situation and to start a discussion about ways to make it easier to import C/C++ code in a secure and reliable manner.
+The goal is to explore the current situation of crates including statically linked C/C++ libraries and to start a discussion about ways to make it easier to import external code in crates in a secure and reliable manner.
 
 ## Current state
 
 ### Overview
 
-To get an idea to which extent this pattern is used, let's explore crates.io content with an analysis of the crates with more than 100k downloads on 2022-08-07 (the 4,7k top crates, see the  [methodology](https://github.com/amousset/source-crates/blob/main/methodology.md) for more details).
+To get an idea of the extent of this pattern, let's explore crates.io content with an analysis of the crates with more than 100k downloads on 2022-08-07 (the 4,7k top crates, see the  [methodology](https://github.com/amousset/source-crates/blob/main/methodology.md) for more details).
 
-There are currently 70 C/C++ native libraries included in 58 crates from the top 4,7k crates (included with submodules, not counting those directly copied into the crate source). Some of them are widely used, like `libz-sys` with 20M downloads and 46 reverse dependencies, or `libgit2-sys` with 11M downloads. Among these crates:
+There are currently 70 C/C++ native libraries included with submodules in 58 crates from the top 4,7k crates. Some of them are widely used, like `libz-sys` with 20M downloads and 46 reverse dependencies, or `libgit2-sys` with 11M downloads. Among these crates:
 
 * 6 have the `-src` suffix in their name
   * `boringssl-src`, `openblas-src`, `sqlite3-src`, `openssl-src`, `zeromq-src` and `luajit-src`
@@ -74,9 +74,9 @@ A lot of widely-used crates include third-party libraries, with little consisten
 
 ## Possible improvements
 
-Just like `-sys` crates have an official definition in cargo docs, with a set of recommended practices, a first step could be to come up with similar guidelines for external source crates. This could build upon implementations, and allow an easy convergence for libraries using different patterns. This could then be improved by additional tooling or metadata.
+Just like `-sys` crates have an official definition in cargo docs, with a set of recommended practices, a first step could be to write an RFC with similar guidelines for external source crates. This could build upon implementations, and allow an easy convergence for libraries using different patterns. It could then be improved by additional tooling or metadata.
 
-### Architecture
+### Dedicated `-src` crates
 
 Having dedicated crates (with the `-src` suffix for discoverability) seems to have quite a few advantages:
 
@@ -85,15 +85,29 @@ Having dedicated crates (with the `-src` suffix for discoverability) seems to ha
 
 One obvious big drawback is the maintenance overhead.
 
-### Configuration
+### Consistent feature-based configuration
 
-Ideally there should be a recommended way (through
-features on `-sys` crates) to:
+Ideally there should be a recommended way (through features of `-sys` crates) to:
 
 * Allow to enforce either static or dynamic linking
 * Keep the convenient default used in most existing crates (dynamic linking with static fallback)
 
 The is already a [pre-RFC](https://internals.rust-lang.org/t/pre-rfc-cargo-features-for-configuring-sys-crates/12431) by @kornel to discuss this.
+
+### Consistent versioning
+
+Most existing `-src` crates use the SemVer build metadata to provide upstream version. Build metadata is [defined](https://semver.org/#spec-item-10) as a _series of dot separated identifiers using only ASCII alphanumerics and hyphens_, which are _ignored when determining version precedence_. Hence, the format is quite flexible, but cannot be used for actual version comparisons (which need to rely on the base SemVer version).
+
+Using the upstream version directly as the crate version would cause some trouble:
+
+* Not all software use SemVer compatible versioning
+* We need to keep a way to publish updated build code without bumping the embedded code
+
+### Accurate metadata
+
+The license of a crate should cover all files included in the crate archive, including external embedded files.
+
+Using a dedicated crate makes it easier by allowing to easily document different licenses for external code and `-sys` crate.
 
 ### Source embedding
 
@@ -105,28 +119,8 @@ There are two ways:
 
 * Source import directly in tree
 
-### Versioning
+  * Makes it harder to know and check where the source comes from
 
-Most existing `-src` crates use the SemVer build metadata to provide upstream version. Build metadata is [defined](https://semver.org/#spec-item-10) as a _series of dot separated identifiers using only ASCII alphanumerics and hyphens_, which are _ignored when determining version precedence_. Hence, the format is quite flexible, but cannot be used for actual version comparisons (which need to rely on the base SemVer version).
+### Improved tooling
 
-Using the upstream version directly as the crate version would cause some trouble:
-
-* Not all software use SemVer compatible versioning
-* We need to keep a way to publish updated build code without bumping the embedded code
-
-### Metadata
-
-The license of a crate should cover all files included in the crate archive, including external embedded files.
-
-Using a dedicated crate makes it easier by allowing to easily document different licenses for external code and `-sys` crate.
-
-### Improve tooling
-
-Some cargo-based tooling could get some knowledge to detect `-src` crates and implement special handling (extract upstream version, etc.), maybe using additional metadata.
-
-## Conclusion
-
-* Do you know other ressources around this topic?
-* If others are interested, a [project group](https://rust-lang.github.io/rfcs/2856-project-groups.html) could be an option to work on this topic.
-
-_Special thanks to @Shnatsel for reviewing this._
+Some cargo-based tooling could learn to detect `-src` crates and implement special handling (extract upstream version, etc.), maybe using additional metadata.

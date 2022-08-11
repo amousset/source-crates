@@ -159,16 +159,15 @@
 <li><a href="#current-state">Current state</a></li>
 <li><a href="#issues">Issues</a></li>
 <li><a href="#possible-improvements">Possible improvements</a></li>
-<li><a href="#conclusion">Conclusion</a></li>
 </ul></li>
 </ul>
 </nav>
 <h1 id="external-source-crates">External source crates</h1>
-<p>This post investigates the Rust crates including third-party code (often C/C++ libraries) statically linked into Rust binaries. The goal is to explore the current situation and to start a discussion about ways to make it easier to import C/C++ code in a secure and reliable manner.</p>
+<p>The goal is to explore the current situation of crates including statically linked C/C++ libraries and to start a discussion about ways to make it easier to import external code in crates in a secure and reliable manner.</p>
 <h2 id="current-state">Current state</h2>
 <h3 id="overview">Overview</h3>
-<p>To get an idea to which extent this pattern is used, let’s explore crates.io content with an analysis of the crates with more than 100k downloads on 2022-08-07 (the 4,7k top crates, see the <a href="https://github.com/amousset/source-crates/blob/main/methodology.md">methodology</a> for more details).</p>
-<p>There are currently 70 C/C++ native libraries included in 58 crates from the top 4,7k crates (included with submodules, not counting those directly copied into the crate source). Some of them are widely used, like <code>libz-sys</code> with 20M downloads and 46 reverse dependencies, or <code>libgit2-sys</code> with 11M downloads. Among these crates:</p>
+<p>To get an idea of the extent of this pattern, let’s explore crates.io content with an analysis of the crates with more than 100k downloads on 2022-08-07 (the 4,7k top crates, see the <a href="https://github.com/amousset/source-crates/blob/main/methodology.md">methodology</a> for more details).</p>
+<p>There are currently 70 C/C++ native libraries included with submodules in 58 crates from the top 4,7k crates. Some of them are widely used, like <code>libz-sys</code> with 20M downloads and 46 reverse dependencies, or <code>libgit2-sys</code> with 11M downloads. Among these crates:</p>
 <ul>
 <li><p>6 have the <code>-src</code> suffix in their name</p>
 <ul>
@@ -237,21 +236,31 @@
 <li><em>Trust</em>: The code is included from external sources, written by unidentified people, and is not visible in tooling like <code>cargo-supply-chain</code>, <code>rust-audit</code> or <code>cargo-crev</code></li>
 </ul>
 <h2 id="possible-improvements">Possible improvements</h2>
-<p>Just like <code>-sys</code> crates have an official definition in cargo docs, with a set of recommended practices, a first step could be to come up with similar guidelines for external source crates. This could build upon implementations, and allow an easy convergence for libraries using different patterns. This could then be improved by additional tooling or metadata.</p>
-<h3 id="crate-architecture">Crate architecture</h3>
+<p>Just like <code>-sys</code> crates have an official definition in cargo docs, with a set of recommended practices, a first step could be to write an RFC with similar guidelines for external source crates. This could build upon implementations, and allow an easy convergence for libraries using different patterns. It could then be improved by additional tooling or metadata.</p>
+<h3 id="dedicated--src-crates">Dedicated <code>-src</code> crates</h3>
 <p>Having dedicated crates (with the <code>-src</code> suffix for discoverability) seems to have quite a few advantages:</p>
 <ul>
 <li>Allow independent versioning, releases, licenses, security advisories</li>
 <li>Give visibility over included code in all cargo-based tooling</li>
 </ul>
 <p>One obvious big drawback is the maintenance overhead.</p>
-<h4 id="configuration">Configuration</h4>
-<p>Ideally there should be a recommended way (through features on <code>-sys</code> crates) to:</p>
+<h3 id="consistent-feature-based-configuration">Consistent feature-based configuration</h3>
+<p>Ideally there should be a recommended way (through features of <code>-sys</code> crates) to:</p>
 <ul>
 <li>Allow to enforce either static or dynamic linking</li>
 <li>Keep the convenient default used in most existing crates (dynamic linking with static fallback)</li>
 </ul>
 <p>The is already a <a href="https://internals.rust-lang.org/t/pre-rfc-cargo-features-for-configuring-sys-crates/12431">pre-RFC</a> by @kornel to discuss this.</p>
+<h3 id="consistent-versioning">Consistent versioning</h3>
+<p>Most existing <code>-src</code> crates use the SemVer build metadata to provide upstream version. Build metadata is <a href="https://semver.org/#spec-item-10">defined</a> as a <em>series of dot separated identifiers using only ASCII alphanumerics and hyphens</em>, which are <em>ignored when determining version precedence</em>. Hence, the format is quite flexible, but cannot be used for actual version comparisons (which need to rely on the base SemVer version).</p>
+<p>Using the upstream version directly as the crate version would cause some trouble:</p>
+<ul>
+<li>Not all software use SemVer compatible versioning</li>
+<li>We need to keep a way to publish updated build code without bumping the embedded code</li>
+</ul>
+<h3 id="accurate-metadata">Accurate metadata</h3>
+<p>The license of a crate should cover all files included in the crate archive, including external embedded files.</p>
+<p>Using a dedicated crate makes it easier by allowing to easily document different licenses for external code and <code>-sys</code> crate.</p>
 <h3 id="source-embedding">Source embedding</h3>
 <p>There are two ways:</p>
 <ul>
@@ -259,24 +268,12 @@
 <ul>
 <li>Some libraries have different contents in git compared to release tarballs, and may have different build procedures (git vs. tarball).</li>
 </ul></li>
-<li><p>Source import in tree</p></li>
-</ul>
-<h3 id="versioning">Versioning</h3>
-<p>Most existing <code>-src</code> crates use the SemVer build metadata to provide upstream version. Build metadata is <a href="https://semver.org/#spec-item-10">defined</a> as a <em>series of dot separated identifiers using only ASCII alphanumerics and hyphens</em>, which are <em>ignored when determining version precedence</em>. Hence, the format is quite flexible, but cannot be used for actual versioning.</p>
-<p>Using the upstream version directly as the crate version would cause some trouble:</p>
+<li><p>Source import directly in tree</p>
 <ul>
-<li>Not all software use SemVer compatible versioning</li>
-<li>We need to keep a way to publish updated build code without bumping the embedded code</li>
+<li>Makes it harder to know and check where the source comes from</li>
+</ul></li>
 </ul>
-<h3 id="metadata">Metadata</h3>
-<p>The license of a crate should probably cover all files included in the crate (and produced binaries), including external embedded files.</p>
-<h3 id="improve-tooling">Improve tooling</h3>
-<p>Some cargo-based tooling could get some knowledge to detect <code>-src</code> crates and implement special handling (extract upstream version, etc.), maybe using additional metadata (external source, etc.).</p>
-<h2 id="conclusion">Conclusion</h2>
-<ul>
-<li>Do you know other ressources around this topic?</li>
-<li>If others are interested, a <a href="https://rust-lang.github.io/rfcs/2856-project-groups.html">project group</a> could be created to work on this topic.</li>
-</ul>
-<p><em>Special thanks to @Shnatsel for reviewing this.</em></p>
+<h3 id="improved-tooling">Improved tooling</h3>
+<p>Some cargo-based tooling could learn to detect <code>-src</code> crates and implement special handling (extract upstream version, etc.), maybe using additional metadata.</p>
 </body>
 </html>
