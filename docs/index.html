@@ -158,120 +158,125 @@
 <ul>
 <li><a href="#current-state">Current state</a></li>
 <li><a href="#issues">Issues</a></li>
-<li><a href="#prior-art">Prior art</a></li>
-<li><a href="#propositions">Propositions</a></li>
+<li><a href="#possible-improvements">Possible improvements</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
 </ul></li>
 </ul>
 </nav>
 <h1 id="external-source-crates">External source crates</h1>
-<p>It is a good idea to use crates.io as a repository for C/C++ dependencies used by Rust library? It’s already massively used, and we need to deal with it.</p>
-<p>make it easier to import C/C++ code in a secure and reliable manner and keep it up-to-date</p>
-<p>This article investigates the Rust crates including third-party code (often C/C++ libraries) statically linked into Rust binaries. The goal is to explore the current situation and the challenges it creates, and to propose some possible improvements.</p>
+<p>This post investigates the Rust crates including third-party code (often C/C++ libraries) statically linked into Rust binaries. The goal is to explore the current situation and to start a discussion about ways to make it easier to import C/C++ code in a secure and reliable manner.</p>
 <h2 id="current-state">Current state</h2>
 <h3 id="overview">Overview</h3>
-<p>To get an idea to which extend this pattern is used, let’s explore crates.io content with an analysis of the crates with more than 100k downloads on 2022-08-07 (the 4,7k top crates), see the <a href="https://github.com/amousset/source-crates/blob/main/methodology.md"><code>methodology</code></a> for more details.</p>
-<p>There are currently 70 C/C++ native libraries included in 58 crates from the top 4,7k crates (included with submodules, not counting those directly copied into the crate source). Some of them are highly used, like <code>libz-sys</code> with 20M downloads en 46 reverse dependencies, or <code>libgit2-sys</code> with 11M downloads).</p>
-<p>Among these 58 crates:</p>
+<p>To get an idea to which extent this pattern is used, let’s explore crates.io content with an analysis of the crates with more than 100k downloads on 2022-08-07 (the 4,7k top crates, see the <a href="https://github.com/amousset/source-crates/blob/main/methodology.md">methodology</a> for more details).</p>
+<p>There are currently 70 C/C++ native libraries included in 58 crates from the top 4,7k crates (included with submodules, not counting those directly copied into the crate source). Some of them are widely used, like <code>libz-sys</code> with 20M downloads and 46 reverse dependencies, or <code>libgit2-sys</code> with 11M downloads. Among these crates:</p>
 <ul>
-<li><p>6 have the <code>-src</code> suffix in their name (<code>boringssl-src</code>, <code>openblas-src</code>, <code>sqlite3-src</code>, <code>openssl-src</code>, <code>zeromq-src</code> and <code>luajit-src</code>). A total of 47 crates in crates.io have the <code>-src</code> suffix.</p></li>
-<li><p>38 are <code>-sys</code> crates that include a library directly (<code>libevent-sys</code>, <code>pcre2-sys</code>, <code>lmdb-sys</code>, <code>lzma-sys</code>, <code>lmdb-rkv-sys</code>, <code>croaring-sys</code>, <code>openvino-sys</code>, <code>zstd-sys</code>, <code>cloudflare-zlib-sys</code>, <code>mozjpeg-sys</code>, <code>boring-sys</code>, <code>libsodium-sys</code>, <code>librocksdb-sys</code>, <code>libz-sys</code>, <code>libnghttp2-sys</code>, <code>libgit2-sys</code>, <code>sdl2-sys</code>, <code>curl-sys</code>, <code>rpmalloc-sys</code>, <code>sass-sys</code>, <code>rdkafka-sys</code>, <code>snmalloc-sys</code>, <code>wabt-sys</code>, <code>z3-sys</code>, <code>ckb-librocksdb-sys</code>, <code>libssh2-sys</code>, <code>libbpf-sys</code>, <code>oboe-sys</code>, <code>lz4-sys</code>, <code>tikv-jemalloc-sys</code>, <code>fasthash-sys</code>, <code>libusb1-sys</code>, <code>shaderc-sys</code>, <code>minimp3-sys</code>, <code>jemalloc-sys</code>, <code>liblmdb-sys</code>, <code>aom-sys</code>, <code>brotli-sys</code>). A total of 2288 crates in crates.io have the <code>-sys</code> suffix.</p></li>
-<li><p>2 have a <code>_sys</code> suffix (<code>audiopus_sys</code> and <code>onig_sys</code>), i.e. almost-<code>-sys</code> crates.</p></li>
-<li><p>1 has an <code>-ffi</code> suffix (<code>wepoll-ffi</code>), i.e. a <code>-sys</code> variant.</p></li>
-<li><p>12 have no specific name pattern (<code>afl</code>, <code>hidapi</code>, <code>khronos_api</code>, <code>mimalloc</code>, <code>parity-secp256k1</code>, <code>rust-htslib</code>, <code>rusty_v8</code>, <code>souper-ir</code>, <code>spirv-reflect</code>, <code>sprs</code>, <code>tflite</code>, <code>twox-hash</code>)</p></li>
+<li><p>6 have the <code>-src</code> suffix in their name</p>
+<ul>
+<li><code>boringssl-src</code>, <code>openblas-src</code>, <code>sqlite3-src</code>, <code>openssl-src</code>, <code>zeromq-src</code> and <code>luajit-src</code></li>
+<li>A total of 47 crates in crates.io have the <code>-src</code> suffix.</li>
+</ul></li>
+<li><p>38 are <code>-sys</code> crates that include a library directly</p>
+<ul>
+<li><code>libevent-sys</code>, <code>pcre2-sys</code>, <code>lmdb-sys</code>, <code>lzma-sys</code>, <code>lmdb-rkv-sys</code>, <code>croaring-sys</code>, <code>openvino-sys</code>, <code>zstd-sys</code>, <code>cloudflare-zlib-sys</code>, <code>mozjpeg-sys</code>, <code>boring-sys</code>, <code>libsodium-sys</code>, <code>librocksdb-sys</code>, <code>libz-sys</code>, <code>libnghttp2-sys</code>, <code>libgit2-sys</code>, <code>sdl2-sys</code>, <code>curl-sys</code>, <code>rpmalloc-sys</code>, <code>sass-sys</code>, <code>rdkafka-sys</code>, <code>snmalloc-sys</code>, <code>wabt-sys</code>, <code>z3-sys</code>, <code>ckb-librocksdb-sys</code>, <code>libssh2-sys</code>, <code>libbpf-sys</code>, <code>oboe-sys</code>, <code>lz4-sys</code>, <code>tikv-jemalloc-sys</code>, <code>fasthash-sys</code>, <code>libusb1-sys</code>, <code>shaderc-sys</code>, <code>minimp3-sys</code>, <code>jemalloc-sys</code>, <code>liblmdb-sys</code>, <code>aom-sys</code>, <code>brotli-sys</code></li>
+<li>A total of 2288 crates in crates.io have the <code>-sys</code> suffix.</li>
+</ul></li>
+<li><p>2 have a <code>_sys</code> suffix, a <code>-sys</code> variant</p>
+<ul>
+<li><code>audiopus_sys</code> and <code>onig_sys</code></li>
+</ul></li>
+<li><p>1 has an <code>-ffi</code> suffix, a <code>-sys</code> variant</p>
+<ul>
+<li><code>wepoll-ffi</code></li>
+</ul></li>
+<li><p>12 have no specific name pattern</p>
+<ul>
+<li><code>afl</code>, <code>hidapi</code>, <code>khronos_api</code>, <code>mimalloc</code>, <code>parity-secp256k1</code>, <code>rust-htslib</code>, <code>rusty_v8</code>, <code>souper-ir</code>, <code>spirv-reflect</code>, <code>sprs</code>, <code>tflite</code>, <code>twox-hash</code></li>
+</ul></li>
 </ul>
 <p>Two main patterns appear:</p>
 <ul>
-<li>dedicated crates containing <code>-src</code> in the name. A widely used example is <code>openssl-src</code> (used as <code>openssl-sys</code> dependency if the <code>vendored</code> feature is enabled).</li>
-<li>normal <a href="https://doc.rust-lang.org/cargo/reference/build-scripts.html#-sys-packages"><code>-sys</code> crates</a> which are able to compile the library they are providing an interface for, either by default or only when enabled by a feature flag (see this <a href="https://kornel.ski/rust-sys-crate">blog post</a> for details on how it’s done). A widely used example is <code>curl-sys</code>.</li>
+<li>standard <a href="https://doc.rust-lang.org/cargo/reference/build-scripts.html#-sys-packages"><code>-sys</code> crates</a> which are also able to compile the library they are providing an interface for, either by default or only when enabled by a feature flag (see this <a href="https://kornel.ski/rust-sys-crate">blog post</a> for details on how it’s done).</li>
+<li>dedicated crates containing <code>-src</code> in the name, depended on by <code>-sys</code> crates</li>
 </ul>
-<p>Note that we only analyzed the crates containing submodules, but sometimes the code is vendored directly into the repository, like for example with <code>freetype-sys</code> which has a copy of freetype2 sources. In any case, the source becomes part of the the crate uploaded to the registry, and sometimes of the produced binaries.</p>
+<p><em>Note</em>: This only covers the crates containing submodules, but sometimes the code is vendored directly into the repository, like <code>freetype-sys</code> which has a copy of freetype2 sources. In any case, the source becomes part of the crate uploaded to the registry.</p>
 <h3 id="case-studies">Case studies</h3>
 <p>Let’s have a closer looks at a few representative crates.</p>
 <h4 id="mozjpeg-sys">mozjpeg-sys</h4>
 <ul>
 <li>The source is included through a git submodule.</li>
 <li>The version number of the crate, <code>1.0.2</code>, is not related to the upstream version, <code>4.0.3</code>.</li>
+<li>The license of the crate is <code>IJG</code> which broadly matches the source crate (but seems <a href="https://github.com/mozilla/mozjpeg/blob/5c6a0f0971edf1ed3cf318d7b32308754305ac9a/LICENSE.md">incomplete</a>)</li>
 <li>It always builds <code>mozjpeg</code> as a static dependency.</li>
 </ul>
 <h4 id="curl-sys">curl-sys</h4>
 <ul>
-<li>The crate versions are built as the following SemVer string: <code>0.4.56+curl-7.83.1</code>, defined as <code>MAJOR.MINOR.PATCH+BUILD</code></li>
-<li>“By default, this crate will attempt to dynamically link to the system-wide libcurl and the system-wide SSL library”. It has <code>static-curl</code>/<code>static-ssl</code> features to enforce static linking.</li>
+<li>The source is included through a git submodule.</li>
+<li>The crate versions are built as the following SemVer string: <code>0.4.56+curl-7.83.1</code>, defined as <code>MAJOR.MINOR.PATCH+BUILD</code> with <code>BUILD</code> being <code>curl-</code>+the upstream curl version.</li>
+<li>By default, it will try to dynamically link to the system curl and openssl, and fallback on static linking. It also has <code>static-curl</code>/<code>static-ssl</code> features to enforce static linking.</li>
+<li>There is <a href="https://github.com/alexcrichton/curl-rust/issues/321">no way</a> to enforce dynamic linking (i.e. make the build fail if library is missing on the system).</li>
+<li>The crate documents an <code>MIT</code> license, while curl is licensed under a custom license (but close to MIT).</li>
 </ul>
 <h4 id="openssl-src">openssl-src</h4>
-<p>The <code>openssl-src</code> crate only contains the logic to build openssl and its sources (through a git submodule).</p>
-<p>The crate versions are built as the following SemVer string: <code>111.16.0+1.1.1l</code>, defined as <code>MAJOR.MINOR.PATCH+BUILD</code></p>
-<p>The build metadata here is used as upstream version documentation. The major version documents the compatibility of the library (1.1.OX, 1.1.1X, etc. are compatible). The minor version is incremented at each upstream patch version bump. The patch version is used for changes in the crate not linked to an upstream version bump.</p>
-<p>Build metadata is <a href="https://semver.org/#spec-item-10">defined</a> as:</p>
-<blockquote>
-<p>Build metadata MAY be denoted by appending a plus sign and a series of dot separated identifiers immediately following the patch or pre-release version. Identifiers MUST comprise only ASCII alphanumerics and hyphens [0-9A-Za-z-]. Identifiers MUST NOT be empty. Build metadata MUST be ignored when determining version precedence. Thus two versions that differ only in the build metadata, have the same precedence. Examples: 1.0.0-alpha+001, 1.0.0+20130313144700, 1.0.0-beta+exp.sha.5114f85, 1.0.0+21AF26D3—-117B344092BD.</p>
-</blockquote>
-<p>This means that the upstream version is:</p>
 <ul>
-<li>Ignored by version comparison</li>
-<li>Can contain various embedded version representation</li>
+<li>The source is included through a git submodule.</li>
+<li>The crate only contains the logic to build openssl. The API is in <code>openssl-sys</code> which depends on <code>openssl-src</code> when the <code>vendored</code> feature is enabled (disabled by default). Some crates depending on <code>openssl-sys</code> (like <code>openssl</code> and <code>native-tls</code>) expose a similar flag too.</li>
+<li>The crate documents an <code>MIT OR Apache-2.0</code> license, while openssl is licensed under:
+<ul>
+<li>Apache-2.0 starting from 3.0</li>
+<li>Dual OpenSSL and SSLeay licenses before, which are in particular not compatible with the GPL. The <code>release/111</code> branch providing versions under this license is still maintained.</li>
+</ul></li>
+<li>The crate versions are built as the following SemVer string: <code>111.16.0+1.1.1l</code>, defined as <code>MAJOR.MINOR.PATCH+BUILD</code>, with <code>BUILD</code> being the upstream openssl version.</li>
 </ul>
-<p>The <code>openssl-src</code> crate is used by <code>openssl-sys</code> (and openssl is statically built in the resulting binary) when the <code>vendored</code> feature is enabled (which it is not by default). Crates depending on <code>openssl-sys</code> or (like <code>native-tls</code>) may expose a similar flag too.</p>
 <h2 id="issues">Issues</h2>
+<p>A lot of widely-used crates include third-party libraries, with little consistency. It causes problems in terms of:</p>
 <ul>
-<li>A lot of widely-used crates include third-party libraries</li>
-<li>There is no consistency in naming (crates, features) or behaviors. Some <code>-sys</code> crates (like <a href="https://github.com/alexcrichton/curl-rust/issues/321"><code>curl-sys</code></a>) even silently fall back to using statically linked dependencies if not detected on the build system.</li>
+<li><em>Visibility</em>: It is not always easy to know if a library was statically linked (and which version) as it does not appear in the crates tree, <code>cargo-auditable</code> data, or any automated <a href="https://www.cisa.gov/sbom">SBOM</a> (like <a href="https://github.com/alilleybrinker/cargo-spdx">cargo-spdx</a>)</li>
+<li><em>Usability</em>: The way to select static vs. dynamic compilation varies, and is sometimes not even actionnable. Some <code>-sys</code> crates fall back to using statically linked dependencies if not detected on the build system <a href="https://github.com/alexcrichton/curl-rust/issues/321">without a way to force dynamic linking</a>.</li>
+<li><em>Licenses</em>: The core problem here is that the license documented in the <code>Cargo.toml</code> (which is supposedly thought to cover only the build code) is sometimes different from the licenses applicable to the library itself, meaning the crate metadata does not match reality. In this case they are not easily discoverable, and tools like <code>cargo deny check licenses</code> cannot check them. A good example is the OpenSSL licence for versions before 3.0, which is incompatible with GPL.</li>
+<li><em>Vulnerabilities</em>: Except for <a href="https://rustsec.org/packages/openssl-src.html">dedicated source crates</a>, there is no accurate visibility over vulnerabilities affecting the included library in the usual Rust tooling (<code>cargo-audit</code> and <code>cargo-deny</code>).</li>
+<li><em>Trust</em>: The code is included from external sources, written by unidentified people, and is not visible in tooling like <code>cargo-supply-chain</code>, <code>rust-audit</code> or <code>cargo-crev</code></li>
 </ul>
-<p>This can be a source of problems, especially because of the lack of visibility over the included code in terms of:</p>
+<h2 id="possible-improvements">Possible improvements</h2>
+<p>Just like <code>-sys</code> crates have an official definition in cargo docs, with a set of recommended practices, a first step could be to come up with similar guidelines for external source crates. This could build upon implementations, and allow an easy convergence for libraries using different patterns. This could then be improved by additional tooling or metadata.</p>
+<h3 id="crate-architecture">Crate architecture</h3>
+<p>Having dedicated crates (with the <code>-src</code> suffix for discoverability) seems to have quite a few advantages:</p>
 <ul>
-<li><em>Presence</em>: It is not always easy to even know if a library was statically linked as it does not appear in the crates tree, nor <code>cargo-auditable</code> data.</li>
-<li><em>Licenses</em>: They are often different from the Rust source, and not easily discoverable. For example, <code>cargo deny check licenses</code> cannot check them. A good example is the OpenSSL licence for versions before 3.0, which is incompatible with GPL.</li>
-<li><em>Vulnerabilities</em>: Except for dedicated source crates (<code>openssl-src</code> has <a href="https://rustsec.org/packages/openssl-src.html">RustSec advisories</a>), there is no visibility over vulnerabilities affecting the included library in the usual Rust tooling (<code>cargo-audit</code> and <code>cargo-deny</code>)</li>
-<li><em>Versioning</em>: There is no easy visibility over the upstream version.</li>
-<li><em>Trust</em>: The code is included from external git repositories, written by unidentified people, and is not visible in tooling like <code>cargo-supply-chain</code>, <code>rust-audit</code> or <code>cargo-crev</code></li>
-<li><em>Usability</em>: The way to select static vs. dynamic compilation varies, and is sometimes not even actionnable (i.e. the crates enforce static linking if the library is not found on the system, and dynamic linking otherwise).</li>
+<li>Allow independent versioning, releases, licenses, security advisories</li>
+<li>Give visibility over included code in all cargo-based tooling</li>
 </ul>
-<p>Current challenges with software supply chain attacks push TODO.</p>
-<h3 id="security">Security</h3>
-<h3 id="compliance">Compliance</h3>
-<p>SBOM</p>
-<h2 id="prior-art">Prior art</h2>
-<p>Not much. <code>sys</code> crates for naming-based behavior and conventions.</p>
-<h3 id="other-ecosystems">Other ecosystems</h3>
-<h4 id="d-lang">D-lang</h4>
-<p>https://code.dlang.org/packages/openssl</p>
+<p>One obvious big drawback is the maintenance overhead.</p>
+<h4 id="configuration">Configuration</h4>
+<p>Ideally there should be a recommended way (through features on <code>-sys</code> crates) to:</p>
 <ul>
-<li>Uses a versioning scheme similar to the rust crate (<code>2.0.3+1.1.0h</code>).</li>
-<li>Documents the openssl license as the package license (“OpenSSL or SSLeay”)</li>
+<li>Allow to enforce either static or dynamic linking</li>
+<li>Keep the convenient default used in most existing crates (dynamic linking with static fallback)</li>
 </ul>
-<h2 id="propositions">Propositions</h2>
-<h3 id="define-an-official-convention">Define an official convention</h3>
-<p>Just as <code>-sys</code> crates have an official definition in cargo docs, with a set of best practices, a first step could be to come up with similar guidelines for external source crates. This should build upon and stay compatible with existing implementation, and allow an easy convergence for libraries using different patterns.</p>
-<p>This could be improved by additionnal cargo metadata.</p>
-<h4 id="draft-proposal">Draft proposal</h4>
+<p>The is already a <a href="https://internals.rust-lang.org/t/pre-rfc-cargo-features-for-configuring-sys-crates/12431">pre-RFC</a> by @kornel to discuss this.</p>
+<h3 id="source-embedding">Source embedding</h3>
+<p>There are two ways:</p>
 <ul>
-<li>Split third-party code inclusion into dedicated separate crates, and name them with the <code>-src</code> suffix</li>
-<li>Use the upstream version as crate build version. This means that the crate version needs to be incremented for each upstream update (as already done for <code>openssl-src</code>). The problem is that it makes version requirements in dependant crates less readable (as the upstream version is not part of it). It could a plus though, as a lot of projects don’t use semver versionning.</li>
-<li>Add a reference to the included code in the cargo metadata TODO</li>
-<li>Use a common behavior for static linking in libraries, including feature naming</li>
-</ul>
-<p>This would allow:</p>
+<li><p>git submodule</p>
 <ul>
-<li>To improve discoverability and help library authors who want to allow statically linking a dependency</li>
-<li>To know when a static library is included, directly from <code>cargo-tree</code></li>
-<li>To file RustSec advisories for vulnerabilities in upstream libraries (like already done for <code>openssl-src</code>). We could automate detection based on CVEs for common libraries, and integrate directly with <code>cargo-audit</code> and <code>cargo-deny</code></li>
+<li>Some libraries have different contents in git compared to release tarballs, and may have different build procedures (git vs. tarball).</li>
+</ul></li>
+<li><p>Source import in tree</p></li>
 </ul>
-<h4 id="question">Question</h4>
+<h3 id="versioning">Versioning</h3>
+<p>Most existing <code>-src</code> crates use the SemVer build metadata to provide upstream version. Build metadata is <a href="https://semver.org/#spec-item-10">defined</a> as a <em>series of dot separated identifiers using only ASCII alphanumerics and hyphens</em>, which are <em>ignored when determining version precedence</em>. Hence, the format is quite flexible, but cannot be used for actual versioning.</p>
+<p>Using the upstream version directly as the crate version would cause some trouble:</p>
 <ul>
-<li>Use submodules or not? a repo with submodules is no longer defined by its commit hash, which makes reproducibility a lot harder. Also, it turns out that C/C++ projects often have different contents in git compared to release tarballs, and require different procedures to build from git vs release tarballs.</li>
+<li>Not all software use SemVer compatible versioning</li>
+<li>We need to keep a way to publish updated build code without bumping the embedded code</li>
 </ul>
-<p>Hmm, how should the version synchronization between -sys and -src crates be handled? Is there a way to specify “I want -src version X” even though you don’t depend on it directly? If not, should -sys and src crates be published together and always have the same version to allow selecting a specific version of -src crate?</p>
-<h4 id="limitations--cons">Limitations / Cons</h4>
-<ul>
-<li>This would add a burden on the maintainers (more crates to maintain, more versions to release, etc.)</li>
-<li>If the <code>-src</code> contains dedicated code to build the included code, it is a problem is licensed under a license different from the included code</li>
-<li>There is no standard way to designate a piece of software, espacially C/C++ libraries. It could be a link to a Git repository. TODO</li>
-<li>putting the upstream version in build metadata (i.e. after +) is not a great idea because according to the semver spec there is no defined ordering for versions that only differ by build metadata. Meaning it might not be possible to match on some build versions but not others, which would be necessary for RustSec. But that’s details.</li>
-</ul>
+<h3 id="metadata">Metadata</h3>
+<p>The license of a crate should probably cover all files included in the crate (and produced binaries), including external embedded files.</p>
 <h3 id="improve-tooling">Improve tooling</h3>
-<p>Cargo-based tooling could get some knowledge to detect <code>-src</code> crates and implement special handling (extract upstream version, etc.).</p>
-<p>This could allow implementing correct <a href="https://www.cisa.gov/sbom">SBOM</a> (like <a href="https://github.com/alilleybrinker/cargo-spdx">cargo-spdx</a>).</p>
-<p>automatic import of new releases, automatic import of CVEs to RustSec, etc</p>
-<p>another thing I’ve lamented is how much e.g. curl versions lag behind upstream, even in case of critical security fixes. We could build automated infrastructure for updating library versions: new release tarballs could be pulled automatically, and with a bit of work even published automatically: we could run crater on the dependencies of the crate before and after the update, if all tests pass then publish it without requiring manual review. I believe @HeroicKatora has been working on a “crater for your dependencies” kind of tool</p>
+<p>Some cargo-based tooling could get some knowledge to detect <code>-src</code> crates and implement special handling (extract upstream version, etc.), maybe using additional metadata (external source, etc.).</p>
+<h2 id="conclusion">Conclusion</h2>
+<ul>
+<li>Do you know other ressources around this topic?</li>
+<li>If others are interested, a <a href="https://rust-lang.github.io/rfcs/2856-project-groups.html">project group</a> could be created to work on this topic.</li>
+</ul>
+<p><em>Special thanks to @Shnatsel for reviewing this.</em></p>
 </body>
 </html>
