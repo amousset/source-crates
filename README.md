@@ -64,8 +64,7 @@ Let's have a closer looks at a few representative crates.
 
 ## Issues
 
-A lot of widely-used crates include third-party libraries,
-with little consistency. It causes problems in terms of:
+A lot of widely-used crates include third-party libraries, with little consistency. It causes problems in terms of:
 
 - *Visibility*: It is not always easy to know if a library was statically linked (and which version) as it does not appear in the crates tree, `cargo-auditable` data, or any automated [SBOM](https://www.cisa.gov/sbom) (like [cargo-spdx](https://github.com/alilleybrinker/cargo-spdx))
 - *Usability*: The way to select static vs. dynamic compilation varies, and is sometimes not even actionnable. Some `-sys` crates fall back to using statically linked dependencies if not detected on the build system [without a way to force dynamic linking](https://github.com/alexcrichton/curl-rust/issues/321).
@@ -75,10 +74,9 @@ with little consistency. It causes problems in terms of:
 
 ## Possible improvements
 
-Just like `-sys` crates have an official definition in cargo docs, with a set of recommended practices, a first step could be to come up with similar guidelines for external source crates. This could build upon implementations, and allow an easy convergence for libraries using different patterns.
-This could then be improved by additional tooling or metadata.
+Just like `-sys` crates have an official definition in cargo docs, with a set of recommended practices, a first step could be to come up with similar guidelines for external source crates. This could build upon implementations, and allow an easy convergence for libraries using different patterns. This could then be improved by additional tooling or metadata.
 
-### Crate architecture
+### Architecture
 
 Having dedicated crates (with the `-src` suffix for discoverability) seems to have quite a few advantages:
 
@@ -87,7 +85,7 @@ Having dedicated crates (with the `-src` suffix for discoverability) seems to ha
 
 One obvious big drawback is the maintenance overhead.
 
-#### Configuration
+### Configuration
 
 Ideally there should be a recommended way (through
 features on `-sys` crates) to:
@@ -105,12 +103,11 @@ There are two ways:
 
   * Some libraries have different contents in git compared to release tarballs, and may have different build procedures (git vs. tarball).
 
-* Source import in tree
+* Source import directly in tree
 
 ### Versioning
 
-Most existing `-src` crates use the SemVer build metadata to provide upstream version.
-Build metadata is [defined](https://semver.org/#spec-item-10) as a _series of dot separated identifiers using only ASCII alphanumerics and hyphens_, which are _ignored when determining version precedence_. Hence, the format is quite flexible, but cannot be used for actual versioning.
+Most existing `-src` crates use the SemVer build metadata to provide upstream version. Build metadata is [defined](https://semver.org/#spec-item-10) as a _series of dot separated identifiers using only ASCII alphanumerics and hyphens_, which are _ignored when determining version precedence_. Hence, the format is quite flexible, but cannot be used for actual version comparisons (which need to rely on the base SemVer version).
 
 Using the upstream version directly as the crate version would cause some trouble:
 
@@ -119,15 +116,17 @@ Using the upstream version directly as the crate version would cause some troubl
 
 ### Metadata
 
-The license of a crate should probably cover all files included in the crate (and produced binaries), including external embedded files.
+The license of a crate should cover all files included in the crate archive, including external embedded files.
+
+Using a dedicated crate makes it easier by allowing to easily document different licenses for external code and `-sys` crate.
 
 ### Improve tooling
 
-Some cargo-based tooling could get some knowledge to detect `-src` crates and implement special handling (extract upstream version, etc.), maybe using additional metadata (external source, etc.).
+Some cargo-based tooling could get some knowledge to detect `-src` crates and implement special handling (extract upstream version, etc.), maybe using additional metadata.
 
 ## Conclusion
 
 * Do you know other ressources around this topic?
-* If others are interested, a [project group](https://rust-lang.github.io/rfcs/2856-project-groups.html) could be created to work on this topic.
+* If others are interested, a [project group](https://rust-lang.github.io/rfcs/2856-project-groups.html) could be an option to work on this topic.
 
 _Special thanks to @Shnatsel for reviewing this._
